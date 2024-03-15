@@ -20,6 +20,7 @@ public:
 
 	unsigned int GetNumberOfConnectedRegions() { return this->NumberOfConnectedRegions; }
 	void DilateConnectedComponents(vtkImageData* slice, vtkIntArray* dilatedMaskArr);
+	void CloseConnectedComponents(vtkImageData* slice, vtkIntArray* closedMaskArr);
 
 protected:
 	vtkConnectedCommponentsBinaryImage();

@@ -27,6 +27,7 @@ public:
 		SMOOTH_INPUT_SIGNED_DISTANCE_FIELD_SIMPLE = 4,
 		SMOOTH_INPUT_SIGNED_DISTANCE_FIELD = 5
 	};
+	enum EMorphological { DILATION = 1, CLOSING = 2, NONE = 3 };
 
 	static vtkExtractCenterLineFromRegion *New();
 	vtkTypeMacro(vtkExtractCenterLineFromRegion, vtkImageAlgorithm);
@@ -57,6 +58,9 @@ public:
 
 	vtkSetMacro(ResultType, int);
 	vtkGetMacro(ResultType, int);
+
+	vtkSetMacro(Morphological, unsigned int);
+	vtkGetMacro(Morphological, unsigned int);
 
 protected:
 	vtkExtractCenterLineFromRegion();
@@ -106,6 +110,7 @@ private:
 	bool GoldenSectionSearch;
 	double Tolerance;
 	double StartPoint[3];
+	unsigned int Morphological;
 };
 
 #endif // __vtkExtractCenterLineFromRegion_h

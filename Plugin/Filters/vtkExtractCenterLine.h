@@ -30,12 +30,15 @@ namespace MidsurfaceExtractor
 				RESULT_TYPE_LINE_SET = 1,
 				RESULT_TYPE_POINT_SET = 2
 			};
+			enum EMorphological { DILATION = 1, CLOSING = 2, NONE = 3 };
+
 
 			void SetInputArray(std::string val) { this->InputArray = val; }
 			void SetGoldenSectionSearch(bool val) { this->GoldenSectionSearch = val; }
 			void SetResultType(int val) { this->ResultType = val; }
 			void SetIntegrationStep(double val) { this->IntegrationStep = val; }
 			void SetTolerance(double val) { this->Tolerance = val; }
+			void SetMorphological(unsigned int val) { this->Morphological = val; }
 
 			void ExtractCenterlineFromRegion(const Point3 &arr, vtkImageData *input, vtkPolyData *centerline, int regionID);
 
@@ -73,6 +76,7 @@ namespace MidsurfaceExtractor
 			int ResultType;
 			double IntegrationStep;
 			double Tolerance;
+			unsigned int Morphological;
 		};
 	}
 }

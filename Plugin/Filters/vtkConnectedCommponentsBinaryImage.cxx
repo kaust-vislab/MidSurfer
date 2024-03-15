@@ -116,7 +116,7 @@ void vtkConnectedCommponentsBinaryImage::DilateConnectedComponents(vtkImageData*
 	for (int i = 0; i < size; i++)
 	{	
 		auto pixel = mask->GetTuple1(i);
-		if (mask->GetTuple1(i) == 0)
+		if (pixel == 0)
 		{
 			int x = i % width;
 			int y = i / width;
@@ -145,5 +145,52 @@ void vtkConnectedCommponentsBinaryImage::DilateConnectedComponents(vtkImageData*
 		{
 			dilatedMaskArr->SetTuple1(i, pixel);
 		}
+	}
+}
+
+void vtkConnectedCommponentsBinaryImage::CloseConnectedComponents(vtkImageData* slice, vtkIntArray* closedMaskArr)
+{
+	auto mask = slice->GetPointData()->GetArray("dilatedMask");
+	vtkLog(INFO, "Closing the mask.");
+	auto size = mask->GetNumberOfTuples();
+	auto width = slice->GetDimensions()[0];
+	auto height = slice->GetDimensions()[1];
+	for (int i = 0; i < size; i++)
+	{	
+		auto pixel = mask->GetTuple1(i);
+
+		if (pixel > 0) { // Only process non-zero pixels for erosion
+        int x = i % width;
+        int y = i / width;
+        bool edgePixel = false;
+        for (int j = -1; j <= 1; j++) {
+            for (int k = -1; k <= 1; k++) {
+                int nx = x + k;
+                int ny = y + j;
+                if (nx >= 0 && nx < width && ny >= 0 && ny < height) {
+                    int idx = ny * width + nx;
+                    auto val = mask->GetTuple1(idx);
+                    if (val == 0) {
+                        edgePixel = true;
+                        break;
+                    }
+                }
+            }
+            if (edgePixel) {
+                break;
+            }
+        }
+        if (edgePixel) {
+            // Erode pixel by setting its value to zero
+            closedMaskArr->SetTuple1(i, 0);
+        } else 
+		{
+			closedMaskArr->SetTuple1(i, pixel);
+		}
+    }
+	else 
+	{
+		closedMaskArr->SetTuple1(i, pixel);
+	}
 	}
 }

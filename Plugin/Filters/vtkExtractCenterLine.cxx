@@ -326,7 +326,13 @@ namespace MidsurfaceExtractor
 
 		int CenterlineFromRegionExtractor::AppendPoints(Point3 &p, int k, vtkImageData *slice, vtkPoints *points, vtkCellArray *lines)
 		{
-			auto mask = slice->GetPointData()->GetArray("dilatedMask");
+			auto mask = this->heightArr;
+
+			if (this->Morphological == DILATION) {
+				mask = slice->GetPointData()->GetArray("dilatedMask");
+			} else if (this->Morphological == CLOSING) {
+				mask = slice->GetPointData()->GetArray("closedMask");
+			}
 
 			int curval;
 			bool loop = false;
@@ -678,6 +684,7 @@ void vtkExtractCenterLine::ExtractCenterlineFromSlice(vtkImageData *slice, vtkAp
 		extract.SetIntegrationStep(this->IntegrationStep);
 		extract.SetResultType(this->ResultType);
 		extract.SetTolerance(this->Tolerance);
+		extract.SetMorphological(this->Morphological);
 
 		vtkNew<vtkPolyData> centerline;
 		extract.ExtractCenterlineFromRegion(p, vtkImageData::SafeDownCast(tens->GetOutput()), centerline, regionID);
@@ -714,6 +721,16 @@ int vtkExtractCenterLine::SelectStartingPoints(vtkImageData *slice)
 		dilatedMask->SetNumberOfTuples(slice->GetNumberOfPoints());
 		conn->DilateConnectedComponents(conn->GetOutput(), dilatedMask);
 		slice->GetPointData()->AddArray(dilatedMask);
+
+		if (this->Morphological == CLOSING)
+		{
+			vtkNew<vtkIntArray> closedMask;
+			closedMask->SetNumberOfComponents(1);
+			closedMask->SetName("closedMask");
+			closedMask->SetNumberOfTuples(slice->GetNumberOfPoints());
+			conn->CloseConnectedComponents(slice, closedMask);
+			slice->GetPointData()->AddArray(closedMask);
+		} 
 	}
 
 	auto remove = std::vector<int>();
