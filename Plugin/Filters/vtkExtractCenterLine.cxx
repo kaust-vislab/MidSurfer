@@ -4,7 +4,6 @@
 #include <vtkArrayCalculator.h>
 #include <vtkPassSelectedArrays.h>
 #include <vtkDataArraySelection.h>
-#include <vtkPassArrays.h>
 #include <vtkAppendFilter.h>
 #include <vtkExtractVectorComponents.h>
 #include <vtkDataSetAttributes.h>
@@ -641,11 +640,6 @@ void vtkExtractCenterLine::ExtractCenterlineFromSlice(vtkImageData *slice, vtkAp
 		return;
 	}
 
-	vtkNew<vtkPassSelectedArrays> pass;
-	pass->SetInputData(slice);
-	pass->GetPointDataArraySelection()->EnableArray("smooth");
-	pass->Update();
-
 	if (this->SelectStartingPoints(slice) == -1 || this->StartPoints.size() == 0)
 	{
 		vtkLog(INFO, "No starting points found. Aborting.");
@@ -653,14 +647,14 @@ void vtkExtractCenterLine::ExtractCenterlineFromSlice(vtkImageData *slice, vtkAp
 	}
 
 	// Compute gradients
-	auto grad = vtkSmartPointer<vtkGradientFilter>::New();
+	vtkNew<vtkGradientFilter> grad;
 	grad->SetInputData(slice);
 	grad->SetInputArrayToProcess(0, 0, 0, vtkDataObject::FIELD_ASSOCIATION_POINTS, "smooth");
 	grad->SetResultArrayName("Gradient");
 	grad->Update();
 
 	// Compute tensors
-	auto tens = vtkSmartPointer<vtkGradientFilter>::New();
+	vtkNew<vtkGradientFilter> tens;
 	tens->SetInputConnection(grad->GetOutputPort());
 	tens->SetInputScalars(vtkDataObject::FIELD_ASSOCIATION_POINTS, "Gradient");
 	tens->SetResultArrayName("T");
