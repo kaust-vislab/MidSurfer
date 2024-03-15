@@ -1,0 +1,20 @@
+NAME
+  MidsurfaceExtractor::vtkMidsurfaceExtractor
+LIBRARY_NAME
+  vtkMidsurfaceExtractor
+DEPENDS
+  ParaView::VTKExtensionsCore
+  VTK::FiltersCore
+  VTK::FiltersSources
+  VTK::FiltersParallel
+  VTK::FiltersFlowPaths
+  VTK::ImagingGeneral
+  VTK::CommonCore
+  VTK::ViewsContext2D
+  VTK::CommonExecutionModel
+  VTK::ImagingMath
+PRIVATE_DEPENDS
+  ParaView::VTKExtensionsIOCore
+OPTIONAL_DEPENDS
+  VTK::ParallelCore
+  VTK::ParallelMPI

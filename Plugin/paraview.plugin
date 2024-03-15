@@ -1,0 +1,8 @@
+NAME
+  MidsurfaceExtractor
+DESCRIPTION
+  Tools for extracting the mid-surface from a binary image represting a surface
+REQUIRES_MODULES
+  ParaView::VTKExtensionsIOCore
+  VTK::CommonCore
+  VTK::CommonExecutionModel
