@@ -103,6 +103,8 @@ public:
 	vtkSetMacro(Connectivity, unsigned int);
 	vtkGetMacro(Connectivity, unsigned int);
 
+	vtkSetMacro(Morphological, unsigned int);
+	vtkGetMacro(Morphological, unsigned int);
 
 protected:
 	vtkExtractMidsurface();
@@ -144,6 +146,7 @@ private:
 	double TestingRadius;
 	bool Normalize;
 	unsigned int Connectivity;
+	unsigned int Morphological;
 };
 
 #endif // __vtkExtractMidsurface_h

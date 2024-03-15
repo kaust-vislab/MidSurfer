@@ -36,6 +36,7 @@
 
 #include "vtkSignedDistanceField.h"
 #include "vtkConnectedCommponentsBinaryImage.h"
+#include "vtkXMLImageDataWriter.h"
 
 #include <chrono>
 #include <numbers>
@@ -102,7 +103,7 @@ namespace MidsurfaceExtractor
 			delete[] m;
 		}
 
-		void CenterlineFromRegionExtractor::ExtractCenterlineFromRegion(const Point3 &arr, vtkImageData *slice, vtkPolyData *centerline)
+		void CenterlineFromRegionExtractor::ExtractCenterlineFromRegion(const Point3 &arr, vtkImageData *slice, vtkPolyData *centerline, int regionID)
 		{
 
 			this->heightArr = slice->GetPointData()->GetArray(this->InputArray.c_str());
@@ -325,22 +326,27 @@ namespace MidsurfaceExtractor
 
 		int CenterlineFromRegionExtractor::AppendPoints(Point3 &p, int k, vtkImageData *slice, vtkPoints *points, vtkCellArray *lines)
 		{
-			double curval;
+			auto mask = slice->GetPointData()->GetArray("dilatedMask");
+
+			int curval;
 			bool loop = false;
 			int k0 = k;
 
 			vtkIdType id = slice->FindPoint(p.data());
 			Vector3 v;
 			this->ComputeEigenvector(v, id);
+			
+			// the starting point is the region we are looking at
+			int regionID = mask->GetTuple1(id);
 
 			Vector3 vold;
 			vold = v;
 
 			ComputeNextPoint(p, v, vold);
 			id = slice->FindPoint(p.data());
-			curval = this->heightArr->GetTuple1(id);
+			curval = mask->GetTuple1(id);
 
-			if (curval > 0.5) // nothing to do when outside segmentation mask
+			if (curval == regionID) // nothing to do when outside segmentation mask
 			{
 				points->InsertNextPoint(p[0], p[1], p[2]);
 				InsertNextCell(lines, 0, k);
@@ -348,9 +354,10 @@ namespace MidsurfaceExtractor
 				this->ComputeEigenvector(v, id);
 				ComputeNextPoint(p, v, vold);
 				id = slice->FindPoint(p.data());
-				curval = this->heightArr->GetTuple1(id);
+				// curval = this->heightArr->GetTuple1(id);
+				curval = mask->GetTuple1(id);
 
-				while ((curval > 0.5) && (loop == false) && (k < 10000)) // stop when outside of segmentation mask or found a loop
+				while ((curval == regionID) && (loop == false) && (k < 10000)) // stop when outside of segmentation mask or found a loop
 				{
 					k++;
 
@@ -367,7 +374,8 @@ namespace MidsurfaceExtractor
 					this->ComputeEigenvector(v, id);
 					ComputeNextPoint(p, v, vold);
 					id = slice->FindPoint(p.data());
-					curval = this->heightArr->GetTuple1(id);
+					// curval = this->heightArr->GetTuple1(id);
+					curval = mask->GetTuple1(id);
 				}
 			}
 			else
@@ -662,6 +670,7 @@ void vtkExtractCenterLine::ExtractCenterlineFromSlice(vtkImageData *slice, vtkAp
 
 	MidsurfaceExtractor::Tools::CenterlineFromRegionExtractor extract;
 
+	int regionID = 1;
 	for (Point3 p : this->StartPoints)
 	{
 		extract.SetInputArray(std::string(this->InputArray));
@@ -671,8 +680,10 @@ void vtkExtractCenterLine::ExtractCenterlineFromSlice(vtkImageData *slice, vtkAp
 		extract.SetTolerance(this->Tolerance);
 
 		vtkNew<vtkPolyData> centerline;
-		extract.ExtractCenterlineFromRegion(p, vtkImageData::SafeDownCast(tens->GetOutput()), centerline);
+		extract.ExtractCenterlineFromRegion(p, vtkImageData::SafeDownCast(tens->GetOutput()), centerline, regionID);
 		append->AddInputData(centerline);
+
+		regionID++;
 	}
 
 	append->Update();
@@ -693,6 +704,16 @@ int vtkExtractCenterLine::SelectStartingPoints(vtkImageData *slice)
 	{
 		vtkLog(INFO, "No regions found. Aborting.");
 		return -1;
+	}
+
+	if (this->Morphological == DILATION || this->Morphological == CLOSING)
+	{
+		vtkNew<vtkIntArray> dilatedMask;
+		dilatedMask->SetNumberOfComponents(1);
+		dilatedMask->SetName("dilatedMask");
+		dilatedMask->SetNumberOfTuples(slice->GetNumberOfPoints());
+		conn->DilateConnectedComponents(conn->GetOutput(), dilatedMask);
+		slice->GetPointData()->AddArray(dilatedMask);
 	}
 
 	auto remove = std::vector<int>();
@@ -750,14 +771,14 @@ bool vtkExtractCenterLine::IsDiskShaped(vtkImageData *mask, int regionID)
 	mask->GetPointData()->SetActiveScalars("RegionID");
 
 	vtkLog(INFO, "Checking region " << regionID << ".");
-	double lowThresh = regionID - 0.5;
-	double highThresh = regionID + 0.5;
+	double lowThresh = static_cast<double>(regionID) - 0.5;
+	double highThresh = static_cast<double>(regionID) + 0.5;
 
 	vtkNew<vtkThreshold> threshReg;
 	threshReg->SetInputData(mask);
 	threshReg->SetInputArrayToProcess(0, 0, 0, vtkDataObject::FIELD_ASSOCIATION_POINTS, "RegionID");
-	threshReg->SetLowerThreshold(static_cast<double>(lowThresh));
-	threshReg->SetUpperThreshold(static_cast<double>(highThresh));
+	threshReg->SetLowerThreshold(lowThresh);
+	threshReg->SetUpperThreshold(highThresh);
 	threshReg->Update();
 
 	// if the region is empty, we can skip it
@@ -766,18 +787,6 @@ bool vtkExtractCenterLine::IsDiskShaped(vtkImageData *mask, int regionID)
 		vtkLog(INFO, "Region is empty. Skipping.");
 		return false;
 	}
-
-	vtkNew<vtkContourFilter> contourFilter;
-	contourFilter->SetInputConnection(threshReg->GetOutputPort());
-	contourFilter->SetValue(0, 0.5);
-	contourFilter->Update();
-
-	vtkNew<vtkConnectivityFilter> connectivityFilter;
-	connectivityFilter->SetInputConnection(contourFilter->GetOutputPort());
-	connectivityFilter->SetExtractionModeToAllRegions();
-	connectivityFilter->Update();
-	int numberOfContours = connectivityFilter->GetNumberOfExtractedRegions();
-	vtkLog(INFO, "Found " << numberOfContours << " contours.");
 
 	vtkNew<vtkGeometryFilter> surface;
 	surface->SetInputData(threshReg->GetOutput());

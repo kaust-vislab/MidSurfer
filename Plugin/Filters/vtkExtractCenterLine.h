@@ -37,7 +37,7 @@ namespace MidsurfaceExtractor
 			void SetIntegrationStep(double val) { this->IntegrationStep = val; }
 			void SetTolerance(double val) { this->Tolerance = val; }
 
-			void ExtractCenterlineFromRegion(const Point3 &arr, vtkImageData *input, vtkPolyData *centerline);
+			void ExtractCenterlineFromRegion(const Point3 &arr, vtkImageData *input, vtkPolyData *centerline, int regionID);
 
 		private:
 			CenterlineFromRegionExtractor(const CenterlineFromRegionExtractor &copy_from) = delete;
@@ -88,6 +88,8 @@ public:
 		SMOOTH_INPUT_SIGNED_DISTANCE_FIELD_SIMPLE = 4,
 		SMOOTH_INPUT_SIGNED_DISTANCE_FIELD = 5,
 	};
+
+	enum EMorphological { DILATION = 1, CLOSING = 2, NONE = 3 };
 
 	static vtkExtractCenterLine *New();
 	vtkTypeMacro(vtkExtractCenterLine, vtkImageAlgorithm);
@@ -146,6 +148,9 @@ public:
 	vtkSetMacro(Connectivity, unsigned int);
 	vtkGetMacro(Connectivity, unsigned int);
 
+	vtkSetMacro(Morphological, unsigned int);
+	vtkGetMacro(Morphological, unsigned int);
+
 protected:
 	vtkExtractCenterLine();
 	~vtkExtractCenterLine();
@@ -183,6 +188,7 @@ private:
 	bool ShapeDetection;
 	double Tolerance;
 	unsigned int Connectivity;
+	unsigned int Morphological; // 1 - Dilation, 2 - Closing
 };
 
 #endif // __vtkExtractCenterLine_h

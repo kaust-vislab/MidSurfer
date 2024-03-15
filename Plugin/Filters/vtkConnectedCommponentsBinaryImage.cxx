@@ -105,3 +105,45 @@ void vtkConnectedCommponentsBinaryImage::dfs(int x, int y, int c, std::vector<st
 			dfs(nx, ny, c, g, w);
 	}
 }
+
+void vtkConnectedCommponentsBinaryImage::DilateConnectedComponents(vtkImageData* slice, vtkIntArray* dilatedMaskArr)
+{
+	auto mask = slice->GetPointData()->GetArray("RegionID");
+	vtkLog(INFO, "Dilating the mask.");
+	auto size = mask->GetNumberOfTuples();
+	auto width = slice->GetDimensions()[0];
+	auto height = slice->GetDimensions()[1];
+	for (int i = 0; i < size; i++)
+	{	
+		auto pixel = mask->GetTuple1(i);
+		if (mask->GetTuple1(i) == 0)
+		{
+			int x = i % width;
+			int y = i / width;
+			for (int j = -1; j <= 1; j++)
+			{
+				for (int k = -1; k <= 1; k++)
+				{
+				int nx = x + k;
+				int ny = y + j;
+                if (nx >= 0 && nx < width && ny >= 0 && ny < height) 
+				{
+                    int idx = ny * width + nx;
+                    auto val = mask->GetTuple1(idx);
+						if (val > 0)
+						{
+							dilatedMaskArr->SetTuple1(i, val);
+							break;
+						} else 
+						{
+							dilatedMaskArr->SetTuple1(i, 0);
+						}
+					}
+				}
+			}
+		} else 
+		{
+			dilatedMaskArr->SetTuple1(i, pixel);
+		}
+	}
+}

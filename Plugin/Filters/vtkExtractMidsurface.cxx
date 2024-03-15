@@ -206,6 +206,7 @@ int vtkExtractMidsurface::RequestData(vtkInformation *vtkNotUsed(request),
 			centerline->SetThreshold(this->Threshold);
 			centerline->SetTolerance(this->Tolerance);
 			centerline->SetConnectivity(this->Connectivity);
+			centerline->SetMorphological(this->Morphological);
 			centerline->Update();
 
 			append->AddInputConnection(centerline->GetOutputPort());

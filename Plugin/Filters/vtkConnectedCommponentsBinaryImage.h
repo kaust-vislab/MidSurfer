@@ -3,7 +3,7 @@
 
 #include "vtkMidsurfaceExtractorModule.h" // for export
 #include <vtkImageData.h>
-
+#include <vtkIntArray.h>
 #include "vtkImageAlgorithm.h"
 
 class VTKMIDSURFACEEXTRACTOR_EXPORT vtkConnectedCommponentsBinaryImage : public vtkImageAlgorithm
@@ -19,6 +19,7 @@ public:
 	vtkGetMacro(Connectivity, unsigned int);
 
 	unsigned int GetNumberOfConnectedRegions() { return this->NumberOfConnectedRegions; }
+	void DilateConnectedComponents(vtkImageData* slice, vtkIntArray* dilatedMaskArr);
 
 protected:
 	vtkConnectedCommponentsBinaryImage();

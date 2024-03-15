@@ -426,6 +426,17 @@
 				</Documentation>
 			</IntVectorProperty>
 
+<IntVectorProperty name="Morphological" command="SetMorphological" number_of_elements="1" default_values="1" panel_visibility="advanced">
+				<EnumerationDomain name="enum">
+					<Entry value="1" text="Dilation"/>
+					<Entry value="2" text="Closing"/>
+					<Entry value="3" text="None"/>
+				</EnumerationDomain>
+				<Documentation>
+					This property indicates what type of Morphological operation we do on the segmentation mask.
+				</Documentation>
+			</IntVectorProperty>
+
 			<Hints>
 				<ShowInMenu category="Midsurface Extractor" />
 			</Hints>
@@ -594,7 +605,7 @@
 				</Hints>
 			</DoubleVectorProperty>
 
-			<DoubleVectorProperty name="SigmaDivisor" command="SetSigmaDivisor" number_of_elements="1" default_values="3.0">
+			<DoubleVectorProperty name="SigmaDivisor" command="SetSigmaDivisor" number_of_elements="1" default_values="2.0">
 				<Hints>
 					<PropertyWidgetDecorator type="GenericDecorator"
 											 mode="visibility"
@@ -658,6 +669,17 @@
 				</Documentation>
 			</IntVectorProperty>
 
+			
+<IntVectorProperty name="Morphological" command="SetMorphological" number_of_elements="1" default_values="1" panel_visibility="advanced">
+				<EnumerationDomain name="enum">
+					<Entry value="1" text="Dilation"/>
+					<Entry value="2" text="Closing"/>
+					<Entry value="3" text="None"/>
+				</EnumerationDomain>
+				<Documentation>
+					This property indicates what type of Morphological operation we do on the segmentation mask.
+				</Documentation>
+			</IntVectorProperty>
 
 			<PropertyGroup label="General settings">
 				<Property name="AutomaticStepSize" />
@@ -694,6 +716,7 @@
 				<Property name="Threshold" />
 				<Property name="Tolerance" />
 				<Property name="ResultType" />
+				<Property name="Morphological" />
 			</PropertyGroup>
 
 			<Hints>
@@ -822,7 +845,7 @@
 				</Hints>
 			</DoubleVectorProperty>
 
-			<DoubleVectorProperty name="SigmaDivisor" command="SetSigmaDivisor" number_of_elements="1" default_values="3.0">
+			<DoubleVectorProperty name="SigmaDivisor" command="SetSigmaDivisor" number_of_elements="1" default_values="2.0">
 				<Hints>
 					<PropertyWidgetDecorator type="GenericDecorator"
 											 mode="visibility"
