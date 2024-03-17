@@ -200,17 +200,18 @@ void vtkSignedDistanceField::ComputeStandardDeviations(vtkDoubleArray* dist)
 }
 void vtkSignedDistanceField::ComputeRadiusFactors()
 {
-	vtkLog(INFO, "Computing radius factors");
-	if (this->TestingRadius <= 1)
-	{
-		vtkLog(ERROR, "Testing radius is 0. Setting it to 1");
-		this->TestingRadius = 1.1;
-	}
-	auto radius = (this->StandardDeviations[0] * 2) / (this->TestingRadius - 1);
-	vtkLog(INFO, "Radius: " << radius);
-	this->RadiusFactors[0] = radius;
-	this->RadiusFactors[1] = radius;
-	this->RadiusFactors[2] = radius;
+	// this does not make sense, it was here because of the old implementation of the gaussian smoothing, now that we use vtk one, 
+	// this calculation is done in the background (when setting the radius, they take that as the diameter as opposed to the radius and 
+	// divide square of sigma by the value*2 -1)
+	// if (this->TestingRadius <= 1)
+	// {
+	// 	this->TestingRadius = 1.1;
+	// }
+	// auto radius = (this->StandardDeviations[0] * 2) / (this->TestingRadius);
+	vtkLog(INFO, "Radius: " << this->TestingRadius);
+	this->RadiusFactors[0] = this->TestingRadius;
+	this->RadiusFactors[1] = this->TestingRadius;
+	this->RadiusFactors[2] = this->TestingRadius;
 }
 
 void vtkSignedDistanceField::ComputeSignedDistanceField(vtkDoubleArray* dist, vtkImageData* originalImage, vtkImageAppend* distanceAppend)

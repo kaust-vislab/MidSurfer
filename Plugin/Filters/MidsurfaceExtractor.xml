@@ -605,7 +605,7 @@
 				</Hints>
 			</DoubleVectorProperty>
 
-			<DoubleVectorProperty name="SigmaDivisor" command="SetSigmaDivisor" number_of_elements="1" default_values="2.0">
+			<DoubleVectorProperty name="SigmaDivisor" command="SetSigmaDivisor" number_of_elements="1" default_values="2">
 				<Hints>
 					<PropertyWidgetDecorator type="GenericDecorator"
 											 mode="visibility"
@@ -619,7 +619,7 @@
 				</Hints>
 			</DoubleVectorProperty>
 
-			<DoubleVectorProperty name="TestingRadius" command="SetTestingRadius" number_of_elements="1" default_values="1.0">
+			<DoubleVectorProperty name="TestingRadius" command="SetTestingRadius" number_of_elements="1" default_values="3.0">
 				<Hints>
 					<PropertyWidgetDecorator type="GenericDecorator"
 											 mode="visibility"
@@ -845,7 +845,7 @@
 				</Hints>
 			</DoubleVectorProperty>
 
-			<DoubleVectorProperty name="SigmaDivisor" command="SetSigmaDivisor" number_of_elements="1" default_values="2.0">
+			<DoubleVectorProperty name="SigmaDivisor" command="SetSigmaDivisor" number_of_elements="1" default_values="2">
 				<Hints>
 					<PropertyWidgetDecorator type="GenericDecorator"
 											 mode="visibility"
@@ -859,7 +859,7 @@
 				</Hints>
 			</DoubleVectorProperty>
 
-			<DoubleVectorProperty name="TestingRadius" command="SetTestingRadius" number_of_elements="1" default_values="1.0">
+			<DoubleVectorProperty name="TestingRadius" command="SetTestingRadius" number_of_elements="1" default_values="3.0">
 				<Hints>
 					<PropertyWidgetDecorator type="GenericDecorator"
 											 mode="visibility"
