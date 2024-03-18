@@ -2,6 +2,28 @@
 
 	<ProxyGroup name="filters">
 
+		<SourceProxy name="ZipperTriangulation" class="vtkZipperTriangulation" label="Zipper Triangulation">
+			<Documentation long_help="Long help." short_help="Short help.">
+				Description.
+			</Documentation>
+
+			<InputProperty name="Input" command="SetInputConnection">
+				<ProxyGroupDomain name="groups">
+					<Group name="sources"/>
+					<Group name="filters"/>
+				</ProxyGroupDomain>
+				<DataTypeDomain name="input_type">
+					<DataType value="vtkPolyData"/>
+				</DataTypeDomain>
+			</InputProperty>
+
+			<Hints>
+				<ShowInMenu category="Midsurface Extractor" />
+			</Hints>
+
+			<!-- End ZipperTriangulation -->
+		</SourceProxy>
+
 		<SourceProxy name="GeneratePointCloudFromSegmentationMask" class="vtkGeneratePointCloudFromSegmentationMask" label="Generate Point Cloud From Segmentation Mask">
 			<Documentation long_help="Long help." short_help="Short help.">
 				Description.

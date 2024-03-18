@@ -8,6 +8,7 @@ set(classes
   vtkSignedDistanceField
   vtkConnectedCommponentsBinaryImage
   vtkConnectedCommponentsBinaryImage3D
+  vtkZipperTriangulation
 )
 
 set(sources
