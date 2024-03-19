@@ -213,6 +213,8 @@ namespace MidsurfaceExtractor
 
 				*cx += dist;
 				interpMask->Interpolate(p1.data(), &val);
+
+				if (val < 0.5) *cx -= dist; // undo if we stepped out of segmentation mask
 			} while ((val > 0.5) && (f(p1) > fbx));
 
 			Point3 p2 = p;
@@ -223,6 +225,8 @@ namespace MidsurfaceExtractor
 					p2[k] -= dist * v[k]; // p2 = p2 - dist*v
 				*ax -= dist;
 				interpMask->Interpolate(p2.data(), &val);
+
+				if (val < 0.5) *ax += dist; // undo if we stepped out of segmentation mask
 			} while ((val > 0.5) && (f(p2) > fbx));
 		}
 
