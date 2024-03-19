@@ -55,6 +55,29 @@ namespace MidsurfaceExtractor
 	(b) = (c);            \
 	(c) = (d);
 
+		template <class TReal>
+		TReal **create_matrix(const long nrow, const long ncol)
+		{
+			typedef TReal *TRealPointer;
+			TReal **m = new TRealPointer[nrow];
+
+			TReal *block = (TReal *)calloc(nrow * ncol, sizeof(TReal));
+			m[0] = block;
+			for (int row = 1; row < nrow; ++row)
+			{
+				m[row] = &block[row * ncol];
+			}
+			return m;
+		}
+
+		/* free a TReal matrix allocated with matrix() */
+		template <class TReal>
+		void free_matrix(TReal **m)
+		{
+			free(m[0]);
+			delete[] m;
+		}
+
 		CenterlineFromRegionExtractor::CenterlineFromRegionExtractor() : heightArr(nullptr), smoothHeightArr(nullptr), tensArr(nullptr), InputArray("")
 		{
 			a = create_matrix<double>(3, 3);
@@ -77,29 +100,6 @@ namespace MidsurfaceExtractor
 			heightArr = nullptr;
 
 			// this->SetInputArray(nullptr);
-		}
-
-		template <class TReal>
-		TReal **CenterlineFromRegionExtractor::create_matrix(const long nrow, const long ncol)
-		{
-			typedef TReal *TRealPointer;
-			TReal **m = new TRealPointer[nrow];
-
-			TReal *block = (TReal *)calloc(nrow * ncol, sizeof(TReal));
-			m[0] = block;
-			for (int row = 1; row < nrow; ++row)
-			{
-				m[row] = &block[row * ncol];
-			}
-			return m;
-		}
-
-		/* free a TReal matrix allocated with matrix() */
-		template <class TReal>
-		void CenterlineFromRegionExtractor::free_matrix(TReal **m)
-		{
-			free(m[0]);
-			delete[] m;
 		}
 
 		void CenterlineFromRegionExtractor::ExtractCenterlineFromRegion(const Point3 &arr, vtkImageData *slice, vtkPolyData *centerline)
@@ -517,7 +517,8 @@ void vtkExtractCenterLine::ExtractCenterlineFromSlice(vtkImageData *slice, vtkAp
 
 	if (this->SmoothInput == SMOOTH_INPUT_OFF)
 	{
-		if (!slice->GetPointData()->GetArray("smooth")) {
+		if (!slice->GetPointData()->GetArray("smooth"))
+		{
 			vtkLog(ERROR, "No smooth array found!");
 		}
 

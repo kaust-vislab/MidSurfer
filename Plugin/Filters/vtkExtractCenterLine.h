@@ -19,6 +19,11 @@ namespace MidsurfaceExtractor
 {
 	namespace Tools
 	{
+		template <class TReal>
+		TReal **create_matrix(const long nrow, const long ncol);
+		template <class TReal>
+		void free_matrix(TReal **m);
+
 		class CenterlineFromRegionExtractor
 		{
 		public:
@@ -43,10 +48,6 @@ namespace MidsurfaceExtractor
 			CenterlineFromRegionExtractor(const CenterlineFromRegionExtractor &copy_from) = delete;
 			CenterlineFromRegionExtractor &operator=(const CenterlineFromRegionExtractor &copy_from) = delete;
 
-			template <class TReal>
-			TReal **create_matrix(const long nrow, const long ncol);
-			template <class TReal>
-			void free_matrix(TReal **m);
 			void ComputeNextPoint(Point3 &p, Vector3 &v, Vector3 &vold);
 			void InsertNextCell(vtkCellArray *lines, const vtkIdType id1, const vtkIdType id2);
 			int AppendPoints(Point3 &p, int k, vtkImageData *input, vtkPoints *points, vtkCellArray *lines);

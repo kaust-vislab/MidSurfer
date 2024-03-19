@@ -126,7 +126,7 @@ int vtkExtractMidsurface::RequestData(vtkInformation *vtkNotUsed(request),
 	double bounds[6];
 
 	image->GetDimensions(dims);
-	image->GetSpacing(spacing); // not used yet, but we might want to compute the integration step size based on it
+	image->GetSpacing(spacing);
 	image->GetBounds(bounds);	// not used...
 
 	if (this->AutomaticStepSize)
@@ -142,8 +142,6 @@ int vtkExtractMidsurface::RequestData(vtkInformation *vtkNotUsed(request),
 	}
 
 	vtkNew<vtkAppendPolyData> append;
-
-	// int coords[3];
 
 	if (dims[2] == 1)
 		vtkErrorMacro("ExtractMidsurface only works on a volume (dim z > 1).");
