@@ -127,10 +127,16 @@ int vtkExtractMidsurface::RequestData(vtkInformation *vtkNotUsed(request),
 
 	image->GetDimensions(dims);
 	image->GetSpacing(spacing);
-	image->GetBounds(bounds);	// not used...
+	image->GetBounds(bounds); // not used...
+	
+	this->SetProgressText("Computing step size.");
+	this->UpdateProgress(0.000001);
 
 	if (this->AutomaticStepSize)
 		this->IntegrationStep = std::numbers::sqrt2 * spacing[2];
+
+	this->SetProgressText("Computing smoothed signed distance map.");
+	this->UpdateProgress(0.000002);
 
 	if (this->SmoothInput == SMOOTH_INPUT_GAUSSIAN_3D)
 	{
@@ -147,8 +153,8 @@ int vtkExtractMidsurface::RequestData(vtkInformation *vtkNotUsed(request),
 		vtkErrorMacro("ExtractMidsurface only works on a volume (dim z > 1).");
 	else
 	{
-        ExtractMidsurface(image, append, dims);
-    }
+		ExtractMidsurface(image, append, dims);
+	}
 
 	output->ShallowCopy(append->GetOutput());
 
@@ -164,39 +170,40 @@ int vtkExtractMidsurface::RequestData(vtkInformation *vtkNotUsed(request),
 
 void vtkExtractMidsurface::ExtractMidsurface(vtkImageData *image, vtkAppendPolyData *append, int *dims)
 {
-    for (int z = 0; z < dims[2]; z++)
-    {
-        vtkNew<vtkExtractVOI> slice;
-        slice->SetInputData(image);
-        slice->SetVOI(0, dims[0] - 1, 0, dims[1] - 1, z, z);
-        slice->Update();
+	for (int z = 0; z < dims[2]; z++)
+	{
+		vtkNew<vtkExtractVOI> slice;
+		slice->SetInputData(image);
+		slice->SetVOI(0, dims[0] - 1, 0, dims[1] - 1, z, z);
+		slice->Update();
 
-        vtkNew<vtkExtractCenterLine> centerline;
-        centerline->SetInputData(slice->GetOutput());
-        centerline->SetInputArray(this->InputArray);
-        centerline->SetAutomaticStepSize(false);
-        centerline->SetDistanceType(this->DistanceType);
-        centerline->SetFieldType(this->FieldType);
-        centerline->SetGoldenSectionSearch(this->GoldenSectionSearch);
-        centerline->SetIntegrationStep(this->IntegrationStep);
-        centerline->SetRadiusFactors(this->RadiusFactors);
-        centerline->SetRadiusFactorsSDF(this->RadiusFactorsSDF);
-        centerline->SetResultType(this->ResultType);
-        centerline->SetShapeDetection(this->ShapeDetection);
-        centerline->SetSmoothInput((this->SmoothInput == ESmoothingMethod::SMOOTH_INPUT_GAUSSIAN_3D || this->SmoothInput == ESmoothingMethod::SMOOTH_INPUT_SDF_3D) ? ESmoothingMethod::SMOOTH_INPUT_OFF : this->SmoothInput);
-        centerline->SetStandardDeviations(this->StandardDeviations);
-        centerline->SetStandardDeviationsSDF(this->StandardDeviationsSDF);
-        centerline->SetThreshold(this->Threshold);
-        centerline->SetTolerance(this->Tolerance);
-        centerline->SetConnectivity(this->Connectivity);
-        centerline->Update();
+		vtkNew<vtkExtractCenterLine> centerline;
+		centerline->SetInputData(slice->GetOutput());
+		centerline->SetInputArray(this->InputArray);
+		centerline->SetAutomaticStepSize(false);
+		centerline->SetDistanceType(this->DistanceType);
+		centerline->SetFieldType(this->FieldType);
+		centerline->SetGoldenSectionSearch(this->GoldenSectionSearch);
+		centerline->SetIntegrationStep(this->IntegrationStep);
+		centerline->SetRadiusFactors(this->RadiusFactors);
+		centerline->SetRadiusFactorsSDF(this->RadiusFactorsSDF);
+		centerline->SetResultType(this->ResultType);
+		centerline->SetShapeDetection(this->ShapeDetection);
+		centerline->SetSmoothInput((this->SmoothInput == ESmoothingMethod::SMOOTH_INPUT_GAUSSIAN_3D || this->SmoothInput == ESmoothingMethod::SMOOTH_INPUT_SDF_3D) ? ESmoothingMethod::SMOOTH_INPUT_OFF : this->SmoothInput);
+		centerline->SetStandardDeviations(this->StandardDeviations);
+		centerline->SetStandardDeviationsSDF(this->StandardDeviationsSDF);
+		centerline->SetThreshold(this->Threshold);
+		centerline->SetTolerance(this->Tolerance);
+		centerline->SetConnectivity(this->Connectivity);
+		centerline->Update();
 
-        append->AddInputConnection(centerline->GetOutputPort());
-        this->SetProgressText(("Processing slice " + std::to_string(z) + "/" + std::to_string(dims[2])).c_str());
-        this->UpdateProgress(static_cast<double>(z) / static_cast<double>(dims[2]));
-    }
+		append->AddInputConnection(centerline->GetOutputPort());
 
-		append->Update();
+		this->SetProgressText(("Processing slice " + std::to_string(z) + "/" + std::to_string(dims[2])).c_str());
+		this->UpdateProgress(static_cast<double>(z) / static_cast<double>(dims[2]));
+	}
+
+	append->Update();
 }
 
 void vtkExtractMidsurface::ComputeSmoothSignedDistanceMap(vtkImageData *image)
