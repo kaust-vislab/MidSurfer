@@ -103,8 +103,10 @@ namespace MidsurfaceExtractor
 			delete[] m;
 		}
 
-		void CenterlineFromRegionExtractor::ExtractCenterlineFromRegion(const Point3 &arr, vtkImageData *slice, vtkPolyData *centerline, int regionID)
+		void CenterlineFromRegionExtractor::ExtractCenterlineFromRegion(const Point3 &arr, vtkImageData *slice, vtkPolyData *centerline, int regionID, std::unordered_map<int, std::vector<int>> *remainingPixels)
 		{
+			// vtkLog(INFO, "ExtractCenterlineFromRegion Number of lines in centerline beginning: " << centerline->GetNumberOfLines());
+			// vtkLog(INFO, "ExtractCenterlineFromRegion Number of pixels in region " << regionID << ": " << (*remainingPixels)[regionID].size() << " ..");
 
 			this->heightArr = slice->GetPointData()->GetArray(this->InputArray.c_str());
 			this->smoothHeightArr = slice->GetPointData()->GetArray("smooth");
@@ -130,38 +132,57 @@ namespace MidsurfaceExtractor
 
 			Point3 p = arr;
 
-			vtkLog(INFO, "Extracting line from " << p[0] << ", " << p[1] << ", " << p[2]);
+			vtkLog(INFO, "ExtractCenterlineFromRegion Extracting line from " << p[0] << ", " << p[1] << ", " << p[2]);
 
 			vtkNew<vtkPoints> points;
 			vtkNew<vtkCellArray> lines;
 
+			vtkIdType id = slice->FindPoint(p.data());
 			if (this->GoldenSectionSearch)
 			{
-				vtkIdType id = slice->FindPoint(p.data());
 				Vector3 v;
 				this->ComputeEigenvector(v, id);
 				this->DoGoldenSectionSearch(p, v);
 			}
 
-			vtkLog(INFO, "Corrected to " << p[0] << ", " << p[1] << ", " << p[2]);
+			// add 3 to the max to find the neighborhood (extra 2 because of the dilation and 1 for the central pixel, 0.5 for rounding it up)
+			double max = this->smoothHeightArr->GetTuple1(id)+3;
+			int maxValue = static_cast<int>(max+0.5);
+
+			vtkLog(INFO, "ExtractCenterlineFromRegion Corrected to " << p[0] << ", " << p[1] << ", " << p[2]);
 
 			points->InsertNextPoint(p.data());
 
+			// vtkNew<vtkXMLImageDataWriter> writer;
+			// writer->SetInputData(slice);
+			// auto filename = "slice_previsited_" + std::to_string(regionID) + ".vti";
+			// writer->SetFileName(filename.c_str());
+			// writer->Write(); 
+
+			// add neighborhood of the point to visited (set the value as 1)
+			this->SetAsVisited(slice, p, maxValue, regionID, remainingPixels);
+
+			// auto filename2 = "slice_postvisited_" + std::to_string(regionID) + ".vti";
+			// writer->SetFileName(filename2.c_str());
+			// writer->Write();  
+
 			this->CurrentDirection = 1.0; // forward
-			int k = AppendPoints(p, 1, slice, points, lines);
+			int k = AppendPoints(p, 1, slice, points, lines, regionID, maxValue, remainingPixels);
+			vtkLog(INFO, "ExtractCenterlineFromRegion Number of lines in lines: " <<lines->GetNumberOfCells() << " ..");
 
 			if (k > 0) // if k == 0 we have a loop and are done
 			{
-				vtkLog(INFO, "No loop found, integrating backwards.");
+				vtkLog(INFO, "ExtractCenterlineFromRegion No loop found, integrating backwards.");
 				p = arr;
 				this->CurrentDirection = -1.0; // backward
-				AppendPoints(p, k, slice, points, lines);
+				AppendPoints(p, k, slice, points, lines, regionID, maxValue, remainingPixels);
+			vtkLog(INFO, "ExtractCenterlineFromRegion Number of lines in lines: " <<lines->GetNumberOfCells() << " ..");
 			}
 			else
 			{
-				vtkLog(INFO, "Found loop. Not integrating backwards.");
+				vtkLog(INFO, "ExtractCenterlineFromRegion Found loop. Not integrating backwards.");
 			}
-
+			
 			centerline->SetPoints(points);
 
 			if ((this->ResultType == RESULT_TYPE_LINE_SET) && (centerline->GetNumberOfPoints() > 1)) // line set
@@ -179,6 +200,92 @@ namespace MidsurfaceExtractor
 				}
 				centerline->SetVerts(cells);
 			}
+
+			vtkLog(INFO, "ExtractCenterlineFromRegion Number of lines in centerline end: " << centerline->GetNumberOfLines());
+
+			bool checkMissingLines = true;
+			if (checkMissingLines)
+			{
+				Point3 p = this->CheckIfLineMissing(slice, lines, regionID, remainingPixels);
+				if (p[0] != -1)
+				{
+					// vtkLog(INFO, "ExtractCenterlineFromRegion Found unvisited points, starting: " << p[0] << ", " << p[1] << ", " << p[2]);
+					this->ExtractCenterlineFromRegion(p, slice, centerline, regionID, remainingPixels);
+				}
+			}
+		}
+
+		int CenterlineFromRegionExtractor::SetAsVisited(vtkImageData *slice, Point3 p, int neighborhoodSize, int regionID, std::unordered_map<int, std::vector<int>> *remainingPixels)
+		{
+			auto dims = slice->GetDimensions();
+			auto width = dims[0];
+			auto height = dims[1];
+			auto id = slice->FindPoint(p.data());
+			std::vector<int> remove = {};
+
+			auto visited = slice->GetPointData()->GetArray("visited");
+
+			int x = id % width;
+			int y = id / width;
+			for (int j = -neighborhoodSize; j <= neighborhoodSize; j++)
+			{
+				for (int k = -neighborhoodSize; k <= neighborhoodSize; k++)
+				{
+					int nx = x + k;
+					int ny = y + j;
+					if (nx >= 0 && nx < width && ny >= 0 && ny < height) 
+					{
+						int idx = ny * width + nx;
+						if (visited->GetTuple1(idx) == regionID)
+						{
+						visited->SetTuple1(idx, 0);
+						remove.push_back(idx);
+					}}
+				}
+			}
+
+			(*remainingPixels)[regionID].erase(std::remove_if((*remainingPixels)[regionID].begin(), (*remainingPixels)[regionID].end(), 
+				[&remove](const int& value) {
+					return std::find(remove.begin(), remove.end(), value) != remove.end();
+				}), 
+				(*remainingPixels)[regionID].end());
+
+			vtkLog(INFO, "SetAsVisited Removed " << remove.size() << " pixels from region " << regionID << " ..");
+			return static_cast<int>(remove.size());
+		}
+
+		
+		Point3 CenterlineFromRegionExtractor::CheckIfLineMissing(vtkImageData *slice, vtkCellArray *lines, int regionID, std::unordered_map<int, std::vector<int>> *remainingPixels)
+		{
+			// dataarray visited is the same as the regionID, but the visited parts are set to 0. So we just have to check if there are any regionids 
+			// left unvisited
+			auto visited = slice->GetPointData()->GetArray("visited");
+
+			vtkLog(INFO, "CheckIfLineMissing Checking for missing lines in region " << regionID << " ..");
+			double max = 0;
+			Point3 startingPoint = {-1, -1, -1};
+			auto remaining = (*remainingPixels)[regionID];
+			if (remaining.size() == 0)
+			{
+				vtkLog(INFO, "CheckIfLineMissing No remaining pixels in region " << regionID << " ..");
+				return startingPoint;
+			}
+
+			for (int i = 0; i < remaining.size(); i++)
+			{
+				auto idx = remaining[i];
+				int region = visited->GetTuple1(idx);
+				auto value = slice->GetPointData()->GetArray("smooth")->GetTuple1(idx);
+
+				if (value > max)
+				{
+					auto point = slice->GetPoint(idx);
+					startingPoint = {point[0], point[1], point[2]};
+					max = value;
+				}
+			}
+			vtkLog(INFO, "CheckIfLineMissing Found " << startingPoint[0] << ", " << startingPoint[1] << ", " << startingPoint[2]);
+			return startingPoint;
 		}
 
 		double CenterlineFromRegionExtractor::GetSmoothedValueAlongLine(Point3 &p, Vector3 &v, double x)
@@ -324,7 +431,7 @@ namespace MidsurfaceExtractor
 			lines->InsertNextCell(line);
 		}
 
-		int CenterlineFromRegionExtractor::AppendPoints(Point3 &p, int k, vtkImageData *slice, vtkPoints *points, vtkCellArray *lines)
+		int CenterlineFromRegionExtractor::AppendPoints(Point3 &p, int k, vtkImageData *slice, vtkPoints *points, vtkCellArray *lines, int regionID, int maxValue, std::unordered_map<int, std::vector<int>> *remainingPixels)
 		{
 			auto mask = this->heightArr;
 
@@ -334,6 +441,8 @@ namespace MidsurfaceExtractor
 				mask = slice->GetPointData()->GetArray("closedMask");
 			}
 
+			auto visited = slice->GetPointData()->GetArray("visited");
+
 			int curval;
 			bool loop = false;
 			int k0 = k;
@@ -342,8 +451,8 @@ namespace MidsurfaceExtractor
 			Vector3 v;
 			this->ComputeEigenvector(v, id);
 			
-			// the starting point is the region we are looking at
-			int regionID = mask->GetTuple1(id);
+			// // the starting point is the region we are looking at
+			// int regionID = mask->GetTuple1(id);
 
 			Vector3 vold;
 			vold = v;
@@ -351,6 +460,11 @@ namespace MidsurfaceExtractor
 			ComputeNextPoint(p, v, vold);
 			id = slice->FindPoint(p.data());
 			curval = mask->GetTuple1(id);
+			int curval_m = mask->GetTuple1(id);
+			int curval_v = visited->GetTuple1(id);
+			vtkLog(INFO, "curvalm: " << curval_m << " curvalv" << curval_v << " regionID: " << regionID << " ..");
+
+			auto _ = this->SetAsVisited(slice, p, maxValue, regionID, remainingPixels);
 
 			if (curval == regionID) // nothing to do when outside segmentation mask
 			{
@@ -362,6 +476,8 @@ namespace MidsurfaceExtractor
 				id = slice->FindPoint(p.data());
 				// curval = this->heightArr->GetTuple1(id);
 				curval = mask->GetTuple1(id);
+				
+				auto _ = this->SetAsVisited(slice, p, maxValue, regionID, remainingPixels);
 
 				while ((curval == regionID) && (loop == false) && (k < 10000)) // stop when outside of segmentation mask or found a loop
 				{
@@ -382,6 +498,11 @@ namespace MidsurfaceExtractor
 					id = slice->FindPoint(p.data());
 					// curval = this->heightArr->GetTuple1(id);
 					curval = mask->GetTuple1(id);
+
+					if (this->SetAsVisited(slice, p, maxValue, regionID, remainingPixels) == 0)
+					{
+						vtkLog(INFO, "No more pixels in region " << regionID << " ..");
+					}
 				}
 			}
 			else
@@ -674,10 +795,35 @@ void vtkExtractCenterLine::ExtractCenterlineFromSlice(vtkImageData *slice, vtkAp
 	tens->SetResultArrayName("T");
 	tens->Update();
 
+	// Prepare the array for checking visited points
+	vtkNew<vtkIntArray> visited;
+	visited->SetNumberOfComponents(1);
+	visited->SetNumberOfTuples(slice->GetNumberOfPoints());
+	visited->DeepCopy(slice->GetPointData()->GetArray("dilatedMask"));
+	visited->SetName("visited");
+	slice->GetPointData()->AddArray(visited);
+
+	vtkNew<vtkXMLImageDataWriter> writer;
+	writer->SetInputData(slice);
+	writer->SetFileName("slice_before.vti");
+	writer->Write();
+
+
+	std::unordered_map<int, std::vector<int>>* remainingPixels = new std::unordered_map<int, std::vector<int>>;
+	for (int i = 0; i < slice->GetNumberOfPoints(); i++)
+	{
+		auto region = visited->GetTuple1(i);
+		if (region > 0)
+		{
+			(*remainingPixels)[region].push_back(i);
+		}
+	}
+	vtkLog(INFO, "STARTING regions: " << (*remainingPixels).size() << " ..");
+
 	MidsurfaceExtractor::Tools::CenterlineFromRegionExtractor extract;
 
 	int regionID = 1;
-	for (Point3 p : this->StartPoints)
+	for (Point3 p : this->StartPoints)	
 	{
 		extract.SetInputArray(std::string(this->InputArray));
 		extract.SetGoldenSectionSearch(this->GoldenSectionSearch);
@@ -686,8 +832,9 @@ void vtkExtractCenterLine::ExtractCenterlineFromSlice(vtkImageData *slice, vtkAp
 		extract.SetTolerance(this->Tolerance);
 		extract.SetMorphological(this->Morphological);
 
+		vtkLog(INFO, "Extracting centerline from " << p[0] << ", " << p[1] << ", " << p[2] << " .." << " regionID: " << regionID << " ..");
 		vtkNew<vtkPolyData> centerline;
-		extract.ExtractCenterlineFromRegion(p, vtkImageData::SafeDownCast(tens->GetOutput()), centerline, regionID);
+		extract.ExtractCenterlineFromRegion(p, vtkImageData::SafeDownCast(tens->GetOutput()), centerline, regionID, remainingPixels);
 		append->AddInputData(centerline);
 
 		regionID++;

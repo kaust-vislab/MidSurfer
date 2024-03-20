@@ -40,7 +40,7 @@ namespace MidsurfaceExtractor
 			void SetTolerance(double val) { this->Tolerance = val; }
 			void SetMorphological(unsigned int val) { this->Morphological = val; }
 
-			void ExtractCenterlineFromRegion(const Point3 &arr, vtkImageData *input, vtkPolyData *centerline, int regionID);
+			void ExtractCenterlineFromRegion(const Point3 &arr, vtkImageData *input, vtkPolyData *centerline, int regionID, std::unordered_map<int, std::vector<int>> *remainingPixels);
 
 		private:
 			CenterlineFromRegionExtractor(const CenterlineFromRegionExtractor &copy_from) = delete;
@@ -52,7 +52,7 @@ namespace MidsurfaceExtractor
 			void free_matrix(TReal **m);
 			void ComputeNextPoint(Point3 &p, Vector3 &v, Vector3 &vold);
 			void InsertNextCell(vtkCellArray *lines, const vtkIdType id1, const vtkIdType id2);
-			int AppendPoints(Point3 &p, int k, vtkImageData *input, vtkPoints *points, vtkCellArray *lines);
+			int AppendPoints(Point3 &p, int k, vtkImageData *input, vtkPoints *points, vtkCellArray *lines, int regionID, int maxValue, std::unordered_map<int, std::vector<int>> *remainingPixels);
 			void ComputeEigenvector(Vector3 &v, const vtkIdType id);
 			void DoGoldenSectionSearch(Point3 &p, Vector3 &v);
 			template <class F>
@@ -61,6 +61,8 @@ namespace MidsurfaceExtractor
 			double golden(Point3 &p, Vector3 &v, double ax, double bx, double cx, F f);
 			double GetSmoothedValue(Point3 &p);
 			double GetSmoothedValueAlongLine(Point3 &p, Vector3 &v, double x);
+			Point3 CheckIfLineMissing(vtkImageData *slice, vtkCellArray *lines, int regionID, std::unordered_map<int, std::vector<int>> *remainingPixels);
+			int SetAsVisited(vtkImageData *slice, Point3 p, int neighborhoodSize, int regionID, std::unordered_map<int, std::vector<int>> *remainingPixels);
 
 			std::string InputArray;
 			vtkDataArray *heightArr;

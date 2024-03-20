@@ -33,7 +33,7 @@
 vtkStandardNewMacro(vtkSignedDistanceField);
 
 vtkSignedDistanceField::vtkSignedDistanceField()
-	: InputArray(nullptr), FinalResultName(nullptr) {
+	: InputArray(nullptr), SDFResultName(nullptr), FinalResultName(nullptr) {
 	this->SetNumberOfInputPorts(1);
 	this->SetNumberOfOutputPorts(1);
 }
@@ -114,7 +114,7 @@ int vtkSignedDistanceField::RequestData(vtkInformation* vtkNotUsed(request),
 
 	if (this->Smoothing)
 	{
-		auto smooth_image = vtkSmartPointer<vtkDoubleArray>::New();
+		vtkNew<vtkDoubleArray> smooth_image;
 		smooth_image->SetNumberOfComponents(1);
 		smooth_image->SetNumberOfTuples(inArr->GetNumberOfTuples());
 
@@ -134,7 +134,7 @@ int vtkSignedDistanceField::RequestData(vtkInformation* vtkNotUsed(request),
 
 void vtkSignedDistanceField::GaussianSmooth(vtkDoubleArray* smooth_image, vtkDoubleArray* dist)
 {
-	auto dist_image = vtkSmartPointer<vtkImageData>::New();
+	vtkNew<vtkImageData> dist_image;
 	dist_image->SetDimensions(this->dims);
 	dist_image->GetPointData()->SetScalars(dist);
 
@@ -149,7 +149,7 @@ void vtkSignedDistanceField::GaussianSmooth(vtkDoubleArray* smooth_image, vtkDou
 	vtkLog(INFO, "Standard deviations: " << this->StandardDeviations[0] << " " << this->StandardDeviations[1] << " " << this->StandardDeviations[2]);
 	vtkLog(INFO, "Radius factors: " << this->RadiusFactors[0] << " " << this->RadiusFactors[1] << " " << this->RadiusFactors[2]);
 
-	auto smooth = vtkSmartPointer<vtkImageGaussianSmooth>::New();
+	vtkNew<vtkImageGaussianSmooth> smooth;
 	smooth->SetInputData(dist_image);
 	smooth->SetStandardDeviations(this->StandardDeviations);
 	smooth->SetRadiusFactors(this->RadiusFactors);
@@ -157,7 +157,7 @@ void vtkSignedDistanceField::GaussianSmooth(vtkDoubleArray* smooth_image, vtkDou
 
 	if (this->Normalize) {
 		// normalize the smooth image (is this necessary for the consecutive steps?)
-		auto shiftscale = vtkSmartPointer<vtkImageShiftScale>::New();
+		vtkNew<vtkImageShiftScale> shiftscale;
 		shiftscale->SetInputData(smooth->GetOutput());
 		double oldRange = smooth->GetOutput()->GetScalarRange()[1] - smooth->GetOutput()->GetScalarRange()[0];
 		shiftscale->SetShift(-1.0 * smooth->GetOutput()->GetScalarRange()[0]);
@@ -217,44 +217,40 @@ void vtkSignedDistanceField::ComputeRadiusFactors()
 void vtkSignedDistanceField::ComputeSignedDistanceField(vtkDoubleArray* dist, vtkImageData* originalImage, vtkImageAppend* distanceAppend)
 {
 	vtkLog(INFO, "Computing signed distance field");
-	auto root_inside = vtkSmartPointer<vtkImageMathematics>::New();
-	auto root_outside = vtkSmartPointer<vtkImageMathematics>::New();
+	vtkNew<vtkImageMathematics> root_inside;
+	vtkNew<vtkImageMathematics> root_outside;
 
 	vtkLog(INFO, "original image dimensions: " << originalImage->GetDimensions()[0] << " " << originalImage->GetDimensions()[1] << " " << originalImage->GetDimensions()[2]);
 
 	if (this->FieldType == INSIDE || this->FieldType == BOTH)
 	{
-		vtkLog(INFO, "debug");
-		auto dist_inside = vtkSmartPointer<vtkImageEuclideanDistance>::New();
+		vtkNew<vtkImageEuclideanDistance> dist_inside;
 		dist_inside->SetInputData(originalImage);
 		dist_inside->SetDimensionality(this->DistanceType == _2D ? 2 : 3);
 		dist_inside->SetAlgorithmToSaito();
 		dist_inside->Update();
-		vtkLog(INFO, "debug");
 
 		root_inside->SetInput1Data(dist_inside->GetOutput());
 		root_inside->SetOperationToSquareRoot();
 		root_inside->Update();
-		vtkLog(INFO, "debug");
-
 	}
 
 	if (this->FieldType == OUTSIDE || this->FieldType == BOTH)
 	{
-		auto invert = vtkSmartPointer<vtkImageMathematics>::New();
+		vtkNew<vtkImageMathematics> invert;
 		invert->SetInput1Data(originalImage);
 		invert->SetOperationToAddConstant();
 		invert->SetConstantC(1);
 		invert->Update();
 
-		auto replace = vtkSmartPointer<vtkImageMathematics>::New();
+		vtkNew<vtkImageMathematics> replace;
 		replace->SetInputData(invert->GetOutput());
 		replace->SetOperationToReplaceCByK();
 		replace->SetConstantK(0);
 		replace->SetConstantC(2);
 		replace->Update();
 
-		auto dist_outside = vtkSmartPointer<vtkImageEuclideanDistance>::New();
+		vtkNew<vtkImageEuclideanDistance> dist_outside;
 		dist_outside->SetInputConnection(replace->GetOutputPort());
 		dist_outside->SetDimensionality(this->DistanceType == _2D ? 2 : 3);
 		dist_outside->SetAlgorithmToSaito();
@@ -267,7 +263,7 @@ void vtkSignedDistanceField::ComputeSignedDistanceField(vtkDoubleArray* dist, vt
 
 	if (this->FieldType == BOTH)
 	{
-		auto combine = vtkSmartPointer<vtkImageMathematics>::New();
+		vtkNew<vtkImageMathematics> combine;
 		combine->SetInput1Data(root_inside->GetOutput());
 		combine->SetInput2Data(root_outside->GetOutput());
 		combine->SetOperationToSubtract();
@@ -286,8 +282,6 @@ void vtkSignedDistanceField::ComputeSignedDistanceField(vtkDoubleArray* dist, vt
 	{
 		if (this->DistanceType == _2D)
 		{
-		vtkLog(INFO, "debug");
-
 			distanceAppend->AddInputData(root_inside->GetOutput());
 			vtkLog(INFO, "distance append dimensions: " << distanceAppend->GetOutput()->GetDimensions()[0] << " " << distanceAppend->GetOutput()->GetDimensions()[1] << " " << distanceAppend->GetOutput()->GetDimensions()[2]);
 		}

@@ -115,6 +115,8 @@ void vtkConnectedCommponentsBinaryImage::DilateConnectedComponents(vtkImageData*
 	auto height = slice->GetDimensions()[1];
 	for (int i = 0; i < size; i++)
 	{	
+		bool found = false;
+		int reg = 0;
 		auto pixel = mask->GetTuple1(i);
 		if (pixel == 0)
 		{
@@ -124,22 +126,25 @@ void vtkConnectedCommponentsBinaryImage::DilateConnectedComponents(vtkImageData*
 			{
 				for (int k = -1; k <= 1; k++)
 				{
-				int nx = x + k;
-				int ny = y + j;
-                if (nx >= 0 && nx < width && ny >= 0 && ny < height) 
-				{
-                    int idx = ny * width + nx;
-                    auto val = mask->GetTuple1(idx);
+					int nx = x + k;
+					int ny = y + j;
+					if (nx >= 0 && nx < width && ny >= 0 && ny < height) 
+					{
+						int idx = ny * width + nx;
+						auto val = mask->GetTuple1(idx);
 						if (val > 0)
 						{
-							dilatedMaskArr->SetTuple1(i, val);
-							break;
-						} else 
-						{
-							dilatedMaskArr->SetTuple1(i, 0);
-						}
+							found = true;
+							reg = val;
+						} 
 					}
 				}
+			}
+			if (found) 
+			{
+				dilatedMaskArr->SetTuple1(i, reg);
+			} else {
+				dilatedMaskArr->SetTuple1(i, 0);
 			}
 		} else 
 		{
