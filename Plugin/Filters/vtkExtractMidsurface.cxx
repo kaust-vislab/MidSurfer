@@ -126,7 +126,7 @@ int vtkExtractMidsurface::RequestData(vtkInformation *vtkNotUsed(request),
 	double bounds[6];
 
 	image->GetDimensions(dims);
-	image->GetSpacing(spacing); // not used yet, but we might want to compute the integration step size based on it
+	image->GetSpacing(spacing);
 	image->GetBounds(bounds);	// not used...
 
 	if (this->AutomaticStepSize)
@@ -134,59 +134,44 @@ int vtkExtractMidsurface::RequestData(vtkInformation *vtkNotUsed(request),
 
 	if (this->SmoothInput == SMOOTH_INPUT_GAUSSIAN_3D)
 	{
-		// copy the input array to double array
-		vtkNew<vtkArrayCalculator> calc;
-		calc->SetInputData(image);
-		calc->AddScalarArrayName(this->InputArray);
-		calc->SetFunction(this->InputArray);
-		calc->SetResultArrayName("smooth");
-		calc->SetResultArrayType(VTK_DOUBLE);
-		calc->Update();
-
-		vtkNew<vtkImageGaussianSmooth> smooth;
-		smooth->SetInputData(calc->GetOutput());
-		smooth->SetInputArrayToProcess(0, 0, 0, vtkDataObject::FIELD_ASSOCIATION_POINTS, "smooth");
-		smooth->SetRadiusFactors(this->RadiusFactors);
-		smooth->SetStandardDeviations(this->StandardDeviations);
-		smooth->Update();
-
-		image->GetPointData()->AddArray(smooth->GetOutput()->GetPointData()->GetArray("smooth"));
-	} else if (this->SmoothInput == SMOOTH_INPUT_SDF_3D)
+		ComputeGaussianSmoothing(image);
+	}
+	else if (this->SmoothInput == SMOOTH_INPUT_SDF_3D)
 	{
-		vtkLog(INFO, "Smoothing input with SDF");
-		
-		vtkNew<vtkSignedDistanceField> sdf;
-		sdf->SetInputData(image);
-		sdf->SetInputArray(this->InputArray);
-		sdf->SetDistanceType(this->DistanceType);
-		sdf->SetFieldType(this->FieldType);
-		sdf->SetSmoothing(this->Smoothing);
-		sdf->SetManualSmoothing(this->ManualSmoothing);
-		sdf->SetRadiusFactors(this->SDFRadiusFactors);
-		sdf->SetStandardDeviations(this->SDFStandardDeviations);
-		sdf->SetSigmaDivisor(this->SigmaDivisor);
-		sdf->SetTestingRadius(this->TestingRadius);
-		sdf->SetNormalize(this->Normalize);
-		sdf->SetFinalResultName("smooth");
-		sdf->Update();
-
-		image->GetPointData()->AddArray(sdf->GetOutput()->GetPointData()->GetArray("smooth"));
+		ComputeSmoothSignedDistanceMap(image);
 	}
 
 	vtkNew<vtkAppendPolyData> append;
-
-	// int coords[3];
 
 	if (dims[2] == 1)
 		vtkErrorMacro("ExtractMidsurface only works on a volume (dim z > 1).");
 	else
 	{
-		for (int z = 0; z < dims[2]; z++)
-		{
-			vtkNew<vtkExtractVOI> slice;
-			slice->SetInputData(image);
-			slice->SetVOI(0, dims[0] - 1, 0, dims[1] - 1, z, z);
-			slice->Update();
+        ExtractMidsurface(image, append, dims);
+    }
+
+	output->ShallowCopy(append->GetOutput());
+
+	const auto timer_end{std::chrono::steady_clock::now()};
+	const std::chrono::duration<double> elapsed_time(timer_end - timer_start);
+	vtkLog(INFO, "Elapsed time: " << std::to_string(elapsed_time.count()));
+	// vtkLog(INFO, "Elapsed time: " << elapsed_time); // should work but doesn't
+
+	vtkVLog(PARAVIEW_LOG_PLUGIN_VERBOSITY(), "vtkExtractMidsurface::RequestData() END");
+
+	return 1;
+}
+
+void vtkExtractMidsurface::ExtractMidsurface(vtkImageData *image, vtkAppendPolyData *append, int *dims)
+{
+    for (int z = 0; z < dims[2]; z++)
+    {
+		vtkLog(INFO, "Processing slice " + std::to_string(z) + "/" + std::to_string(dims[2]));
+		
+        vtkNew<vtkExtractVOI> slice;
+        slice->SetInputData(image);
+        slice->SetVOI(0, dims[0] - 1, 0, dims[1] - 1, z, z);
+        slice->Update();
 
 			vtkNew<vtkExtractCenterLine> centerline;
 			centerline->SetInputData(slice->GetOutput());
@@ -209,21 +194,53 @@ int vtkExtractMidsurface::RequestData(vtkInformation *vtkNotUsed(request),
 			centerline->SetMorphological(this->Morphological);
 			centerline->Update();
 
-			append->AddInputConnection(centerline->GetOutputPort());
-			this->SetProgressText(("Processing slice " + std::to_string(z) + "/" + std::to_string(dims[2])).c_str());
-			this->UpdateProgress(static_cast<double>(z)/static_cast<double>(dims[2]));
-		}
-	}
+        append->AddInputConnection(centerline->GetOutputPort());
+        this->SetProgressText(("Processing slice " + std::to_string(z) + "/" + std::to_string(dims[2])).c_str());
+        this->UpdateProgress(static_cast<double>(z) / static_cast<double>(dims[2]));
+    }
 
-	append->Update();
-	output->ShallowCopy(append->GetOutput());
+		append->Update();
+}
 
-	const auto timer_end{std::chrono::steady_clock::now()};
-	const std::chrono::duration<double> elapsed_time(timer_end - timer_start);
-	vtkLog(INFO, "Elapsed time: " << std::to_string(elapsed_time.count()));
-	// vtkLog(INFO, "Elapsed time: " << elapsed_time); // should work but doesn't
+void vtkExtractMidsurface::ComputeSmoothSignedDistanceMap(vtkImageData *image)
+{
+	vtkLog(INFO, "Smoothing input with SDF");
 
-	vtkVLog(PARAVIEW_LOG_PLUGIN_VERBOSITY(), "vtkExtractMidsurface::RequestData() END");
+	vtkNew<vtkSignedDistanceField> sdf;
+	sdf->SetInputData(image);
+	sdf->SetInputArray(this->InputArray);
+	sdf->SetDistanceType(this->DistanceType);
+	sdf->SetFieldType(this->FieldType);
+	sdf->SetSmoothing(this->Smoothing);
+	sdf->SetManualSmoothing(this->ManualSmoothing);
+	sdf->SetRadiusFactors(this->SDFRadiusFactors);
+	sdf->SetStandardDeviations(this->SDFStandardDeviations);
+	sdf->SetSigmaDivisor(this->SigmaDivisor);
+	sdf->SetTestingRadius(this->TestingRadius);
+	sdf->SetNormalize(this->Normalize);
+	sdf->SetFinalResultName("smooth");
+	sdf->Update();
 
-	return 1;
+	image->GetPointData()->AddArray(sdf->GetOutput()->GetPointData()->GetArray("smooth"));
+}
+
+void vtkExtractMidsurface::ComputeGaussianSmoothing(vtkImageData *image)
+{
+	// copy the input array to double array
+	vtkNew<vtkArrayCalculator> calc;
+	calc->SetInputData(image);
+	calc->AddScalarArrayName(this->InputArray);
+	calc->SetFunction(this->InputArray);
+	calc->SetResultArrayName("smooth");
+	calc->SetResultArrayType(VTK_DOUBLE);
+	calc->Update();
+
+	vtkNew<vtkImageGaussianSmooth> smooth;
+	smooth->SetInputData(calc->GetOutput());
+	smooth->SetInputArrayToProcess(0, 0, 0, vtkDataObject::FIELD_ASSOCIATION_POINTS, "smooth");
+	smooth->SetRadiusFactors(this->RadiusFactors);
+	smooth->SetStandardDeviations(this->StandardDeviations);
+	smooth->Update();
+
+	image->GetPointData()->AddArray(smooth->GetOutput()->GetPointData()->GetArray("smooth"));
 }

@@ -30,7 +30,7 @@ public:
 		SMOOTH_INPUT_SDF_3D = 6
 	};
 
-	static vtkExtractMidsurface* New();
+	static vtkExtractMidsurface *New();
 	vtkTypeMacro(vtkExtractMidsurface, vtkImageAlgorithm);
 
 	vtkGetStringMacro(InputArray);
@@ -78,7 +78,6 @@ public:
 	vtkSetMacro(ResultType, int);
 	vtkGetMacro(ResultType, int);
 
-
 	vtkSetMacro(Smoothing, bool);
 	vtkGetMacro(Smoothing, bool);
 
@@ -105,23 +104,26 @@ public:
 
 	vtkSetMacro(Morphological, unsigned int);
 	vtkGetMacro(Morphological, unsigned int);
-
 protected:
 	vtkExtractMidsurface();
 	~vtkExtractMidsurface();
 
-	int RequestData(vtkInformation*, vtkInformationVector**, vtkInformationVector*) override;
-	int RequestInformation(vtkInformation* vtkNotUsed(request), vtkInformationVector** inputVector, vtkInformationVector* outputVector) override;
-	int FillOutputPortInformation(int, vtkInformation*) override;
+	int RequestData(vtkInformation *, vtkInformationVector **, vtkInformationVector *) override;
+	int RequestInformation(vtkInformation *vtkNotUsed(request), vtkInformationVector **inputVector, vtkInformationVector *outputVector) override;
+	int FillOutputPortInformation(int, vtkInformation *) override;
 
 private:
-	vtkExtractMidsurface(const vtkExtractMidsurface&) = delete;
-	void operator=(const vtkExtractMidsurface&) = delete;
+	vtkExtractMidsurface(const vtkExtractMidsurface &) = delete;
+	void operator=(const vtkExtractMidsurface &) = delete;
+
+	void ComputeGaussianSmoothing(vtkImageData *image);
+	void ComputeSmoothSignedDistanceMap(vtkImageData *image);
+	void ExtractMidsurface(vtkImageData *image, vtkAppendPolyData *append, int *dims);
 
 	// std::vector<vtkExtractCenterLine*> centerlines;
 
 	// GUI parameters
-	char* InputArray;
+	char *InputArray;
 	unsigned int SmoothInput;
 	double Threshold;
 	double IntegrationStep;

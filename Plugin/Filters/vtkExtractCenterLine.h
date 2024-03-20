@@ -11,6 +11,7 @@
 #include <vtkAppendPolyData.h>
 #include <vtkImageInterpolator.h>
 #include <vtkSmartPointer.h>
+#include <vtkIntArray.h>
 
 typedef std::array<double, 3> Point3;
 typedef std::array<double, 3> Vector3;
@@ -19,6 +20,11 @@ namespace MidsurfaceExtractor
 {
 	namespace Tools
 	{
+		template <class TReal>
+		TReal **create_matrix(const long nrow, const long ncol);
+		template <class TReal>
+		void free_matrix(TReal **m);
+
 		class CenterlineFromRegionExtractor
 		{
 		public:
@@ -41,18 +47,15 @@ namespace MidsurfaceExtractor
 			void SetMorphological(unsigned int val) { this->Morphological = val; }
 
 			void ExtractCenterlineFromRegion(const Point3 &arr, vtkImageData *input, vtkPolyData *centerline, int regionID, std::unordered_map<int, std::vector<int>> *remainingPixels);
+			Point3 CheckIfLineMissing(vtkImageData *slice, vtkCellArray *lines, int regionID, std::unordered_map<int, std::vector<int>> *remainingPixels);
 
 		private:
 			CenterlineFromRegionExtractor(const CenterlineFromRegionExtractor &copy_from) = delete;
 			CenterlineFromRegionExtractor &operator=(const CenterlineFromRegionExtractor &copy_from) = delete;
 
-			template <class TReal>
-			TReal **create_matrix(const long nrow, const long ncol);
-			template <class TReal>
-			void free_matrix(TReal **m);
 			void ComputeNextPoint(Point3 &p, Vector3 &v, Vector3 &vold);
 			void InsertNextCell(vtkCellArray *lines, const vtkIdType id1, const vtkIdType id2);
-			int AppendPoints(Point3 &p, int k, vtkImageData *input, vtkPoints *points, vtkCellArray *lines, int regionID, int maxValue, std::unordered_map<int, std::vector<int>> *remainingPixels);
+			int AppendPoints(Point3 &p, int k, vtkImageData *input, vtkPoints *points, vtkCellArray *lines, int regionID, int maxValue, std::unordered_map<int, std::vector<int>> *remainingPixels, vtkPolyData *centerline);
 			void ComputeEigenvector(Vector3 &v, const vtkIdType id);
 			void DoGoldenSectionSearch(Point3 &p, Vector3 &v);
 			template <class F>
@@ -61,8 +64,10 @@ namespace MidsurfaceExtractor
 			double golden(Point3 &p, Vector3 &v, double ax, double bx, double cx, F f);
 			double GetSmoothedValue(Point3 &p);
 			double GetSmoothedValueAlongLine(Point3 &p, Vector3 &v, double x);
-			Point3 CheckIfLineMissing(vtkImageData *slice, vtkCellArray *lines, int regionID, std::unordered_map<int, std::vector<int>> *remainingPixels);
 			int SetAsVisited(vtkImageData *slice, Point3 p, int neighborhoodSize, int regionID, std::unordered_map<int, std::vector<int>> *remainingPixels);
+			bool CheckIfCrossingAnotherLine(vtkPolyData *centerline, Point3 p1, Point3 p2);
+			bool CheckIfIntersect(double* p1, double* p2, double* p3, double* p4);
+			int Orientation(double* p, double* q, double* r);
 
 			std::string InputArray;
 			vtkDataArray *heightArr;
@@ -92,7 +97,7 @@ public:
 		SMOOTH_INPUT_OFF = 1,
 		SMOOTH_INPUT_GAUSSIAN = 2,
 		SMOOTH_INPUT_SIGNED_DISTANCE_FIELD_SIMPLE = 4,
-		SMOOTH_INPUT_SIGNED_DISTANCE_FIELD = 5,
+		SMOOTH_INPUT_SIGNED_DISTANCE_FIELD = 5,[]
 	};
 
 	enum EMorphological { DILATION = 1, CLOSING = 2, NONE = 3 };
@@ -156,6 +161,9 @@ public:
 
 	vtkSetMacro(Morphological, unsigned int);
 	vtkGetMacro(Morphological, unsigned int);
+	
+	vtkSetMacro(MultiLines, bool);
+	vtkGetMacro(MultiLines, bool);
 
 protected:
 	vtkExtractCenterLine();
@@ -171,7 +179,7 @@ private:
 
 	void ExtractCenterlineFromSlice(vtkImageData *input, vtkAppendPolyData *append);
 	bool IsDiskShaped(vtkImageData *slice, int regionID);
-	int SelectStartingPoints(vtkImageData *slice);
+	std::unordered_map<int, Point3> SelectStartingPoints(vtkImageData *slice);
 
 	std::vector<Point3> StartPoints;
 
@@ -195,6 +203,7 @@ private:
 	double Tolerance;
 	unsigned int Connectivity;
 	unsigned int Morphological; // 1 - Dilation, 2 - Closing
+	bool MultiLines;
 };
 
 #endif // __vtkExtractCenterLine_h
