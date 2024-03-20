@@ -658,6 +658,13 @@ void vtkExtractCenterLine::ExtractCenterlineFromSlice(vtkImageData *slice, vtkAp
 	grad->SetResultArrayName("Gradient");
 	grad->Update();
 
+	auto gradArr = grad->GetOutput()->GetPointData()->GetArray("Gradient");
+
+	for (vtkIdType k = 0; k < gradArr->GetNumberOfTuples(); k++)
+	{
+		vtkMath::Normalize(gradArr->GetTuple3(k));
+	}
+	
 	// Compute tensors
 	vtkNew<vtkGradientFilter> tens;
 	tens->SetInputConnection(grad->GetOutputPort());
