@@ -459,6 +459,10 @@
 				</Documentation>
 			</IntVectorProperty>
 
+			<IntVectorProperty name="MultiLines" command="SetMultiLines" number_of_elements="1" default_values="1">
+				<BooleanDomain name="bool"/>
+			</IntVectorProperty>
+
 			<Hints>
 				<ShowInMenu category="Midsurface Extractor" />
 			</Hints>
@@ -703,6 +707,10 @@
 				</Documentation>
 			</IntVectorProperty>
 
+			<IntVectorProperty name="MultiLines" command="SetMultiLines" number_of_elements="1" default_values="1">
+				<BooleanDomain name="bool"/>
+			</IntVectorProperty>
+
 			<PropertyGroup label="General settings">
 				<Property name="AutomaticStepSize" />
 				<Property name="IntegrationStep" />
@@ -739,6 +747,7 @@
 				<Property name="Tolerance" />
 				<Property name="ResultType" />
 				<Property name="Morphological" />
+				<Property name="MultiLines" />
 			</PropertyGroup>
 
 			<Hints>

@@ -192,6 +192,7 @@ void vtkExtractMidsurface::ExtractMidsurface(vtkImageData *image, vtkAppendPolyD
 			centerline->SetTolerance(this->Tolerance);
 			centerline->SetConnectivity(this->Connectivity);
 			centerline->SetMorphological(this->Morphological);
+			centerline->SetMultiLines(this->MultiLines);
 			centerline->Update();
 
         append->AddInputConnection(centerline->GetOutputPort());

@@ -147,6 +147,7 @@ namespace MidsurfaceExtractor
 			// add 3 to the max to find the neighborhood (extra 2 because of the dilation and 1 for the central pixel, 0.5 for rounding it up)
 			double max = this->smoothHeightArr->GetTuple1(id) + 3;
 			int maxValue = static_cast<int>(max + 0.5);
+			vtkLog(INFO, "Max value: " << maxValue);
 
 			vtkLog(INFO, "Corrected to " << p[0] << ", " << p[1] << ", " << p[2]);
 
@@ -474,7 +475,8 @@ namespace MidsurfaceExtractor
 		int CenterlineFromRegionExtractor::AppendPoints(Point3 &p, int k, vtkImageData *slice, vtkPoints *points, vtkCellArray *lines, int regionID, int maxValue, std::unordered_map<int, std::vector<int>> *remainingPixels, vtkPolyData *centerline)
 		{
 			// auto mask = this->heightArr;
-			auto mask = slice->GetPointData()->GetArray("visited");
+			auto mask = slice->GetPointData()->GetArray("RegionID");
+			auto visitedMask = slice->GetPointData()->GetArray("visited");
 
 			if (this->Morphological == DILATION)
 			{
@@ -904,13 +906,11 @@ void vtkExtractCenterLine::ExtractCenterlineFromSlice(vtkImageData *slice, vtkAp
 
 		extract.ExtractCenterlineFromRegion(p, slice, centerline, regionID, remainingPixels);
 		vtkLog(INFO, "Centerline has " << centerline->GetNumberOfPoints() << " points and " << centerline->GetNumberOfCells() << " lines.");
-		vtkLog(INFO, "adding to append ..");
 		append->AddInputData(centerline);
 
 		startingPoints.erase(regionID);
 
-		bool checkMissingLines = true;
-		if (checkMissingLines)
+		if (this->MultiLines)
 		{
 			Point3 p = extract.CheckIfLineMissing(slice, lines, regionID, remainingPixels);
 			if (p[0] != -1)
@@ -920,11 +920,8 @@ void vtkExtractCenterLine::ExtractCenterlineFromSlice(vtkImageData *slice, vtkAp
 			}
 		}
 	}
-	vtkLog(INFO, "updating append ..");
 
 	append->Update();
-
-	vtkLog(INFO, "END OF LOOP ..");
 }
 
 std::unordered_map<int, Point3> vtkExtractCenterLine::SelectStartingPoints(vtkImageData *slice)

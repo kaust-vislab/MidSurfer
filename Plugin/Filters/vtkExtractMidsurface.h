@@ -104,6 +104,10 @@ public:
 
 	vtkSetMacro(Morphological, unsigned int);
 	vtkGetMacro(Morphological, unsigned int);
+
+	vtkSetMacro(MultiLines, bool);
+	vtkGetMacro(MultiLines, bool);
+
 protected:
 	vtkExtractMidsurface();
 	~vtkExtractMidsurface();
@@ -149,6 +153,8 @@ private:
 	bool Normalize;
 	unsigned int Connectivity;
 	unsigned int Morphological;
+	
+	bool MultiLines;
 };
 
 #endif // __vtkExtractMidsurface_h
