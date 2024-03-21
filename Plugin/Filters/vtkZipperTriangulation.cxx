@@ -97,7 +97,7 @@ int vtkZipperTriangulation::RequestData(vtkInformation* vtkNotUsed(request),
     e_sliceno->SetName("EdgeSliceNumber");  
     //set e_sliceno for all edges //copy from vertices 
     e_sliceno->SetNumberOfValues(numEdges);
-    for (vtkIdType e = 0; e < numEdges; ++e) { e_sliceno->SetValue(e, -1); }
+    for (vtkIdType e = 0; e <= 3*numEdges; ++e) { e_sliceno->SetValue(e, -1); }
 
 
     //for (vtkIdType e = 0; e < numEdges; ++e) {
@@ -139,24 +139,48 @@ int vtkZipperTriangulation::RequestData(vtkInformation* vtkNotUsed(request),
     //        // Do something with v1 and v2 (e.g., store them, process them)
     //    }
     //}
+    //for (vtkIdType i = 0; i < numEdges; ++i) {
+    //    vtkSmartPointer<vtkIdList> linePts =  vtkSmartPointer<vtkIdList>::New();
+    //    lines->GetNextCell(linePts); // Get the next line composed of vertices
+    //    vtkIdType v1 = linePts->GetId(0);
+    //    vtkIdType v2 = linePts->GetId(1);
 
-            for (vtkIdType i = 0; i < numEdges; ++i) {
+    //    logfile << "\n  e_sliceno[" << i << "] = " << e_sliceno->GetValue(i);
+    //    logfile << "\t ===> * v1 =" << v1 << "] v2 =" << v2;
+    //}
+     
+
+     for (vtkIdType e = 0; e < numEdges; e++) {
+         int i = e * 3;
+        vtkSmartPointer<vtkIdList> edgePts = vtkSmartPointer<vtkIdList>::New();
+        lines->GetCell(i, edgePts); // Try to get the cell
+        if (edgePts->GetNumberOfIds() > 0) { // Check if the cell contains any points
+            if (edgePts->GetNumberOfIds() == 2) { // Ensure the edge has two points
+                vtkIdType v1 = edgePts->GetId(0);
+                vtkIdType v2 = edgePts->GetId(1);
+                /*int v1_slice = v_sliceno->GetValue(v1);
+                int v2_slice = v_sliceno->GetValue(v2);
+                if (v1_slice == v2_slice) {
+                    e_sliceno->SetValue(i, v1_slice);
+                }
+                else {
+                    e_sliceno->SetValue(i, -1);
+                }*/
+                logfile << "\n dd  e_sliceno[" << i << "] = " << e_sliceno->GetValue(i);
+                logfile << "\t e"<<e<<" = >  " << v1 << "___" << v2;
+            }
+            else {
+                logfile << "\n Error: Edge " << i << " does not have two points.";
+            }
+        }
+        else {
+            logfile << "\n Error: Unable to retrieve cell " << i << " from vtkCellArray.";
+        }
+         
+    }
 
 
-                //vtkSmartPointer<vtkIdList> linePts = vtkSmartPointer<vtkIdList>::New();
-                //lines->GetNextCell(linePts); // Get the next line composed of vertices
-                //vtkIdType v1 = linePts->GetId(0);
-                //vtkIdType v2 = linePts->GetId(1);
 
-                /*lines->GetCell(i, edgePts); 
-                 vtkIdType v1 = edgePts->GetId(0);
-                   vtkIdType v2 = edgePts->GetId(1);*/
-
-                   logfile << "\n  e_sliceno[" << i << "] = " << e_sliceno->GetValue(i);
-                  // logfile << "\t ===>  v1 =" << v1 << "] v2 =" << v2;
-                } 
-
-            
 
 
 //----------------------------------------------------------------------------------------
