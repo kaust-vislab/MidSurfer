@@ -631,7 +631,7 @@
 				</Hints>
 			</DoubleVectorProperty>
 
-			<DoubleVectorProperty name="SigmaDivisor" command="SetSigmaDivisor" number_of_elements="1" default_values="2">
+			<DoubleVectorProperty name="SigmaDivisor" command="SetSigmaDivisor" number_of_elements="1" default_values="1">
 				<Hints>
 					<PropertyWidgetDecorator type="GenericDecorator"
 											 mode="visibility"
@@ -876,7 +876,7 @@
 				</Hints>
 			</DoubleVectorProperty>
 
-			<DoubleVectorProperty name="SigmaDivisor" command="SetSigmaDivisor" number_of_elements="1" default_values="2">
+			<DoubleVectorProperty name="SigmaDivisor" command="SetSigmaDivisor" number_of_elements="1" default_values="1.0">
 				<Hints>
 					<PropertyWidgetDecorator type="GenericDecorator"
 											 mode="visibility"

@@ -45,10 +45,7 @@ int vtkConnectedCommponentsBinaryImage::RequestData(vtkInformation *vtkNotUsed(r
 
 	output->DeepCopy(input);
 
-	vtkLog(INFO, "Adding region IDs to the binary image.");
-
 	AddRegionIDs(output); // requires the original input array
-	vtkLog(INFO, "Region IDs added to the binary image.");
 	return 1;
 }
 
@@ -56,18 +53,14 @@ int vtkConnectedCommponentsBinaryImage::RequestData(vtkInformation *vtkNotUsed(r
 /// @param output the vtkImageData to add the RegionsIDs to
 void vtkConnectedCommponentsBinaryImage::AddRegionIDs(vtkImageData *output)
 {
-	vtkLog(INFO, "1");
 	int dims[3];
 	output->GetDimensions(dims);
 
-	vtkLog(INFO, "2");
 	std::vector<std::vector<int>> g;
 	g.resize(dims[0] + 2, std::vector<int>(dims[1] + 2, 0)); // add zero boundary
 
-	vtkLog(INFO, "3");
 	auto mask = output->GetPointData()->GetArray(this->InputArray);
 
-	vtkLog(INFO, "4");
 	for (int j = 0; j < dims[1]; j++)
 		for (int i = 0; i < dims[0]; i++)
 			g[i + 1][j + 1] = mask->GetTuple1(j * dims[0] + i);
@@ -75,7 +68,6 @@ void vtkConnectedCommponentsBinaryImage::AddRegionIDs(vtkImageData *output)
 	std::vector<std::vector<int>> w;
 	w.resize(dims[0] + 2, std::vector<int>(dims[1] + 2, 0)); // add zero boundary
 	
-	vtkLog(INFO, "5");
 	int set = 1;
 
 	for (int i = 1; i <= dims[0]; i++)
@@ -83,7 +75,6 @@ void vtkConnectedCommponentsBinaryImage::AddRegionIDs(vtkImageData *output)
 			if (g[i][j] && !w[i][j])
 				dfs(i, j, set++, g, w);
 
-	vtkLog(INFO, "6");
 	this->NumberOfConnectedRegions = set - 1;
 	
 	vtkNew<vtkIntArray> cc;
@@ -91,12 +82,10 @@ void vtkConnectedCommponentsBinaryImage::AddRegionIDs(vtkImageData *output)
 	cc->SetNumberOfComponents(1);
 	cc->SetNumberOfTuples(mask->GetNumberOfTuples());
 
-	vtkLog(INFO, "7");
 	for (int j = 0; j < dims[1]; j++)
 		for (int i = 0; i < dims[0]; i++)
 			cc->SetTuple1(j * dims[0] + i, w[i + 1][j + 1]);
 
-	vtkLog(INFO, "8");
 	output->GetPointData()->AddArray(cc);
 	output->GetAttributes(vtkDataObject::POINT)->SetActiveScalars("RegionID");
 }

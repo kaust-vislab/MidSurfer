@@ -55,7 +55,7 @@ namespace MidsurfaceExtractor
 
 			void ComputeNextPoint(Point3 &p, Vector3 &v, Vector3 &vold);
 			void InsertNextCell(vtkCellArray *lines, const vtkIdType id1, const vtkIdType id2);
-			int AppendPoints(Point3 &p, int k, vtkImageData *input, vtkPoints *points, vtkCellArray *lines, int regionID, int maxValue, std::unordered_map<int, std::vector<int>> *remainingPixels, vtkPolyData *centerline);
+			int AppendPoints(Point3 &p, int k, vtkImageData *input, vtkPoints *points, vtkCellArray *lines, int regionID, int maxValue, std::unordered_map<int, std::vector<int>> *remainingPixels, vtkPolyData *centerline, std::vector<int> *pixelsToRemove);
 			void ComputeEigenvector(Vector3 &v, const vtkIdType id);
 			void DoGoldenSectionSearch(Point3 &p, Vector3 &v);
 			template <class F>
@@ -64,10 +64,9 @@ namespace MidsurfaceExtractor
 			double golden(Point3 &p, Vector3 &v, double ax, double bx, double cx, F f);
 			double GetSmoothedValue(Point3 &p);
 			double GetSmoothedValueAlongLine(Point3 &p, Vector3 &v, double x);
-			int SetAsVisited(vtkImageData *slice, Point3 p, int neighborhoodSize, int regionID, std::unordered_map<int, std::vector<int>> *remainingPixels);
-			bool CheckIfCrossingAnotherLine(vtkPolyData *centerline, Point3 p1, Point3 p2);
-			bool CheckIfIntersect(double* p1, double* p2, double* p3, double* p4);
-			int Orientation(double* p, double* q, double* r);
+			void SetPointAsVisited(vtkImageData *slice, Point3 p, int neighborhoodSize, int regionID, std::unordered_map<int, std::vector<int>> *remainingPixels, std::vector<int> *pixelsToRemove);
+			void RemoveVisitedPixels(vtkImageData *slice, std::vector<int> *pixelsToRemove);
+			void LogCurrentCenterLine(vtkPolyData *centerline, std::string filename);
 
 			std::string InputArray;
 			vtkDataArray *heightArr;
