@@ -140,6 +140,8 @@ int vtkExtractMidsurface::RequestData(vtkInformation *vtkNotUsed(request),
 	{
 		ComputeSmoothSignedDistanceMap(image);
 	}
+	
+	vtkLog(INFO, "Smoothing the volume.");
 
 	vtkNew<vtkAppendPolyData> append;
 
@@ -147,6 +149,7 @@ int vtkExtractMidsurface::RequestData(vtkInformation *vtkNotUsed(request),
 		vtkErrorMacro("ExtractMidsurface only works on a volume (dim z > 1).");
 	else
 	{
+		vtkLog(INFO, "Extracting midsurface.");
         ExtractMidsurface(image, append, dims);
     }
 

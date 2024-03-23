@@ -46,7 +46,7 @@ namespace MidsurfaceExtractor
 			void SetTolerance(double val) { this->Tolerance = val; }
 			void SetMorphological(unsigned int val) { this->Morphological = val; }
 
-			void ExtractCenterlineFromRegion(const Point3 &arr, vtkImageData *input, vtkPolyData *centerline, int regionID, std::unordered_map<int, std::vector<int>> *remainingPixels);
+			bool ExtractCenterlineFromRegion(const Point3 &arr, vtkImageData *input, vtkPolyData *centerline, int regionID, std::unordered_map<int, std::vector<int>> *remainingPixels);
 			Point3 CheckIfLineMissing(vtkImageData *slice, vtkCellArray *lines, int regionID, std::unordered_map<int, std::vector<int>> *remainingPixels);
 
 		private:

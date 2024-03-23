@@ -105,7 +105,7 @@ namespace MidsurfaceExtractor
 			// this->SetInputArray(nullptr);
 		}
 
-		void CenterlineFromRegionExtractor::ExtractCenterlineFromRegion(const Point3 &arr, vtkImageData *slice, vtkPolyData *centerline, int regionID, std::unordered_map<int, std::vector<int>> *remainingPixels)
+		bool CenterlineFromRegionExtractor::ExtractCenterlineFromRegion(const Point3 &arr, vtkImageData *slice, vtkPolyData *centerline, int regionID, std::unordered_map<int, std::vector<int>> *remainingPixels)
 		{
 			this->heightArr = slice->GetPointData()->GetArray(this->InputArray.c_str());
 			this->smoothHeightArr = slice->GetPointData()->GetArray("smooth");
@@ -149,8 +149,8 @@ namespace MidsurfaceExtractor
 			double max = this->smoothHeightArr->GetTuple1(id) + 3;
 			int maxValue = static_cast<int>(max + 0.5);
 
+			bool loop = false;
 			std::vector<int> *pixelsToRemove = new std::vector<int>;
-			double* borderingPoint;
 
 			points->InsertNextPoint(p.data());
 			vtkLog(INFO, "Starting point: " << p[0] << ", " << p[1] << ", " << p[2] << " ..");
@@ -168,6 +168,7 @@ namespace MidsurfaceExtractor
 			else
 			{
 				vtkLog(INFO, "Found loop. Not integrating backwards.");
+				loop = true;
 			}
 
 			// remove the pixels that we have visited
@@ -190,6 +191,8 @@ namespace MidsurfaceExtractor
 				}
 				centerline->SetVerts(cells);
 			}
+
+			return loop;
 		}
 
 		void CenterlineFromRegionExtractor::LogCurrentCenterLine(vtkPolyData *centerline, std::string filename)
@@ -656,6 +659,8 @@ int vtkExtractCenterLine::RequestData(vtkInformation *vtkNotUsed(request),
 
 void vtkExtractCenterLine::ExtractCenterlineFromSlice(vtkImageData *slice, vtkAppendPolyData *append)
 {
+	vtkLog(INFO, "Extracting centerline from slice ..");
+
 	this->StartPoints.clear();
 
 	if (this->SmoothInput == SMOOTH_INPUT_OFF)
@@ -791,6 +796,8 @@ void vtkExtractCenterLine::ExtractCenterlineFromSlice(vtkImageData *slice, vtkAp
 		return;
 	}
 
+	vtkLog(INFO, "I have the smoothed volume ..");
+
 	// Prepare the array for checking visited points
 	vtkNew<vtkIntArray> visited;
 	visited->SetNumberOfComponents(1);
@@ -826,6 +833,7 @@ void vtkExtractCenterLine::ExtractCenterlineFromSlice(vtkImageData *slice, vtkAp
 			(*remainingPixels)[regionID].push_back(i);
 		}
 	}
+
 	vtkLog(INFO, "Starting regions: " << (*remainingPixels).size() << " ..");
 
 	for (auto &[regionID, p] : *remainingPixels)
@@ -853,12 +861,12 @@ void vtkExtractCenterLine::ExtractCenterlineFromSlice(vtkImageData *slice, vtkAp
 		vtkNew<vtkPoints> points;
 		vtkNew<vtkCellArray> lines;
 
-		extract.ExtractCenterlineFromRegion(p, slice, centerline, regionID, remainingPixels);
+		bool loop = extract.ExtractCenterlineFromRegion(p, slice, centerline, regionID, remainingPixels);
 		append->AddInputData(centerline);
 
 		startingPoints.erase(regionID);
 
-		if (this->MultiLines)
+		if (this->MultiLines && !loop) // do not go checking in if there was a loop, because there shouldn't be anything left
 		{
 			Point3 p = extract.CheckIfLineMissing(slice, lines, regionID, remainingPixels);
 			if (p[0] != -1)
@@ -879,6 +887,8 @@ std::unordered_map<int, Point3> vtkExtractCenterLine::SelectStartingPoints(vtkIm
 	conn->SetInputArray(this->InputArray);
 	conn->SetConnectivity(this->Connectivity);
 	conn->Update();
+
+	vtkLog(INFO, "Connected components done ..");
 
 	auto numberOfRegions = conn->GetNumberOfConnectedRegions();
 	vtkLog(INFO, "Found " << numberOfRegions << " regions.");
