@@ -73,7 +73,8 @@ double dist_bw_2es(vtkPolyData* mesh, vtkIdType e1, vtkIdType e2) {
     return sqrt(d1);
 }
 //...........................................................................................................................  
-bool Create2Triangles(vtkPolyData* mesh, vtkIdType e1, vtkIdType e2, double d) {
+bool Create2Triangles(vtkPolyData* mesh, vtkSmartPointer<vtkCellArray> cells, vtkIdType e1, vtkIdType e2, double d) {
+    //we can use d for avoiding triangles with longer edges 
     /*if (dist_bw_2es(mesh, e1, e2) > d)
         return false;*/
     vtkPoints* points = mesh->GetPoints();
@@ -107,17 +108,12 @@ bool Create2Triangles(vtkPolyData* mesh, vtkIdType e1, vtkIdType e2, double d) {
         dir1[i] = p2[i] - p1[i];
         dir2[i] = p4[i] - p3[i];
     } 
-
      
-
-    //// Calculate the direction vectors for each edge
-    //double dir1[3] = { p2[0] - p1[0], p2[1] - p1[1], p2[2] - p1[2] };
-    //double dir2[3] = { p4[0] - p3[0], p4[1] - p3[1], p4[2] - p3[2] }; 
     // Check the direction of edges e1 and e2
     double dotProduct = vtkMath::Dot(dir1, dir2);
-    vtkSmartPointer<vtkCellArray> cells = mesh->GetPolys();
+    //vtkSmartPointer<vtkCellArray> cells = mesh->GetPolys();
 
-    if (dotProduct > 0) {
+    if (dotProduct > 0) { 
         double p1p2[3], p4p2[3];
         for (int i = 0; i < 3; ++i) {
             p1p2[i] = p1[i] - p2[i];
@@ -133,39 +129,22 @@ bool Create2Triangles(vtkPolyData* mesh, vtkIdType e1, vtkIdType e2, double d) {
         double v1v2v4 = vtkMath::AngleBetweenVectors(p1p2, p4p2);//angle at v2 
         //This calculates the angle at vertex v2 using the vectors from v1 to v2 and from v2 to v4.
         double v2v1v3 = vtkMath::AngleBetweenVectors(p2p1, p3p1);//angle at v1
-        if (v1v2v4 > v2v1v3) {
-            return false;
-            vtkSmartPointer<vtkTriangle> triangle1 = vtkSmartPointer<vtkTriangle>::New();
-            triangle1->GetPointIds()->SetId(0, v1);
-            triangle1->GetPointIds()->SetId(1, v2);
-            triangle1->GetPointIds()->SetId(2, v3);
-
-            vtkSmartPointer<vtkTriangle> triangle2 = vtkSmartPointer<vtkTriangle>::New();
-            triangle2->GetPointIds()->SetId(0, v2);
-            triangle2->GetPointIds()->SetId(1, v3);
-            triangle2->GetPointIds()->SetId(2, v4);
-
-            cells->InsertNextCell(triangle1);
-            cells->InsertNextCell(triangle2);
+        if (v1v2v4 > v2v1v3) {  
+            vtkIdType triangle1[3] = { v1, v2, v3 };
+            vtkIdType triangle2[3] = { v2, v3, v4 };
+            cells->InsertNextCell(3,triangle1);
+            cells->InsertNextCell(3, triangle2);
 
         }
         else {
-            vtkSmartPointer<vtkTriangle> triangle1 = vtkSmartPointer<vtkTriangle>::New();
-            triangle1->GetPointIds()->SetId(0, v1);
-            triangle1->GetPointIds()->SetId(1, v2);
-            triangle1->GetPointIds()->SetId(2, v4);
+            vtkIdType triangle1[3] = { v1, v2, v4 };
+            vtkIdType triangle2[3] = { v1, v3, v4 }; 
+            cells->InsertNextCell(3, triangle1);
+            cells->InsertNextCell(3, triangle2);
 
-            vtkSmartPointer<vtkTriangle> triangle2 = vtkSmartPointer<vtkTriangle>::New();
-            triangle2->GetPointIds()->SetId(0, v1);
-            triangle2->GetPointIds()->SetId(1, v3);
-            triangle2->GetPointIds()->SetId(2, v4);
-
-            cells->InsertNextCell(triangle1);
-            cells->InsertNextCell(triangle2); 
         }
     }
-    else {// opposit direction so dignoal may either be v2v4 OR v1v3
-
+    else {// opposit direction so dignoal may either be v2v4 OR v1v3 
         double p1p2[3], p3p2[3];
         for (int i = 0; i < 3; ++i) {
             p1p2[i] = p1[i] - p2[i];
@@ -181,40 +160,23 @@ bool Create2Triangles(vtkPolyData* mesh, vtkIdType e1, vtkIdType e2, double d) {
         double v1v2v3 = vtkMath::AngleBetweenVectors(p1p2, p3p2);//angle at v2
         double v2v1v4 = vtkMath::AngleBetweenVectors(p2p1,p4p1);//angle at v1
 
-        if (v1v2v3 > v2v1v4) {
-           // M.facets.create_triangle(v1, v2, v4);
-            //M.facets.create_triangle(v2, v4, v3);
-            vtkSmartPointer<vtkTriangle> triangle1 = vtkSmartPointer<vtkTriangle>::New();
-            triangle1->GetPointIds()->SetId(0, v1);
-            triangle1->GetPointIds()->SetId(1, v2);
-            triangle1->GetPointIds()->SetId(2, v4);
+        if (v1v2v3 > v2v1v4) { 
+            vtkIdType triangle1[3] = { v1, v2, v4 };
+            vtkIdType triangle2[3] = { v2, v3, v4 };
 
-            vtkSmartPointer<vtkTriangle> triangle2 = vtkSmartPointer<vtkTriangle>::New();
-            triangle2->GetPointIds()->SetId(0, v2);
-            triangle2->GetPointIds()->SetId(1, v4);
-            triangle2->GetPointIds()->SetId(2, v3);
+            cells->InsertNextCell(3, triangle1);
+            cells->InsertNextCell(3, triangle2);
 
-            cells->InsertNextCell(triangle1);
-            cells->InsertNextCell(triangle2);
 
         }
         else
-        {
-           // M.facets.create_triangle(v1, v2, v3);
-           // M.facets.create_triangle(v1, v3, v4);
+        { 
+            vtkIdType triangle1[3] = { v1, v2, v3 };
+            vtkIdType triangle2[3] = { v1, v3, v4 };
 
-            vtkSmartPointer<vtkTriangle> triangle1 = vtkSmartPointer<vtkTriangle>::New();
-            triangle1->GetPointIds()->SetId(0, v1);
-            triangle1->GetPointIds()->SetId(1, v2);
-            triangle1->GetPointIds()->SetId(2, v3);
+            cells->InsertNextCell(3, triangle1);
+            cells->InsertNextCell(3, triangle2);
 
-            vtkSmartPointer<vtkTriangle> triangle2 = vtkSmartPointer<vtkTriangle>::New();
-            triangle2->GetPointIds()->SetId(0, v1);
-            triangle2->GetPointIds()->SetId(1, v3);
-            triangle2->GetPointIds()->SetId(2, v4);
-
-            cells->InsertNextCell(triangle1);
-            cells->InsertNextCell(triangle2);
         } 
     }
      
@@ -429,9 +391,15 @@ int vtkZipperTriangulation::RequestData(vtkInformation* vtkNotUsed(request),
 
     //e_up end --- forward labelling done 
     //----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
-    // now it is time to triangulate each pair of edges ebtm and eup 
+    //----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+    //----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+    //----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+    // now it is time to triangulate each pair of edges ebtm and eup //main loop
 
-    for (vtkIdType s = slices_begin; s < slices_end; s++) {
+    vtkSmartPointer<vtkCellArray> cells = output->GetPolys();
+    cells->Allocate(numEdges* 3);
+
+    for (vtkIdType s = slices_begin; s < 16; s++) {
         const auto& edges_btm_slice = edges_slice_s[s - slices_begin]; 
 
         for (vtkIdType e1 : edges_btm_slice) {
@@ -439,36 +407,9 @@ int vtkZipperTriangulation::RequestData(vtkInformation* vtkNotUsed(request),
             vtkIdType e2 = e_up[e1];
 
             // Check if e1 and e2 form a valid pair
-            if (e2 != -1 && e_btm[e2] == e1) {
-                // Get the vertices of edges e1 and e2 happy d
+            if (e2 != -1 && e_btm[e2] == e1) { 
                // Create1Quad(output, e1, e2, 2);
-                Create2Triangles(output, e1, e2, 2);
-               // vtkIdType v0 = output->GetCell(e1)->GetPointId(0);
-               // vtkIdType v1 = output->GetCell(e1)->GetPointId(1);
-
-               // vtkIdType v2 = output->GetCell(e2)->GetPointId(0);
-               // vtkIdType v3 = output->GetCell(e2)->GetPointId(1);
-
-               // // Create a quad from the vertices of e1 and e2  
-
-               // // Now, you can use quad to create a vtkCell or perform further operations 
-               //// Create two triangles
-               // vtkSmartPointer<vtkTriangle> triangle1 = vtkSmartPointer<vtkTriangle>::New();
-               // triangle1->GetPointIds()->SetId(0, v0);
-               // triangle1->GetPointIds()->SetId(1, v1);
-               // triangle1->GetPointIds()->SetId(2, v2);
-
-               // vtkSmartPointer<vtkTriangle> triangle2 = vtkSmartPointer<vtkTriangle>::New();
-               // triangle2->GetPointIds()->SetId(0, v0);
-               // triangle2->GetPointIds()->SetId(1, v2);
-               // triangle2->GetPointIds()->SetId(2, v3);
-
-               // // Add triangles to your vtkCellArray// Get the cell array from the output polydata
-               // vtkSmartPointer<vtkCellArray> cells = output->GetPolys();
-
-               // cells->InsertNextCell(triangle1);
-               // cells->InsertNextCell(triangle2);
-
+                Create2Triangles(output, cells, e1, e2, 1); 
             }
             else {
                 // Handle the case where e1 and e2 do not form a valid pair
