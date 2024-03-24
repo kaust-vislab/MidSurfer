@@ -262,10 +262,10 @@ int vtkZipperTriangulation::RequestData(vtkInformation* vtkNotUsed(request),
 
     // Get the input and output
     vtkPolyData* input = vtkPolyData::SafeDownCast(inInfo->Get(vtkDataObject::DATA_OBJECT()));
-    vtkPolyData* output = vtkPolyData::SafeDownCast(outInfo->Get(vtkDataObject::DATA_OBJECT()));
 
-    // Perform the shallow copy
-    output->ShallowCopy(input);
+    // deep copy for initialization
+    vtkNew<vtkPolyData> mesh;
+    mesh->ShallowCopy(input);
 
     // Create a scalar array to store the slice numbers for points
 // Include the necessary header
@@ -277,14 +277,14 @@ int vtkZipperTriangulation::RequestData(vtkInformation* vtkNotUsed(request),
     v_sliceno->SetName("PointSliceNumber");
 
     // Calculate and assign the slice numbers for points
-    vtkIdType numPoints = output->GetNumberOfPoints();
-    vtkIdType numVertices = output->GetNumberOfVerts();
+    vtkIdType numPoints = mesh->GetNumberOfPoints();
+    vtkIdType numVertices = mesh->GetNumberOfVerts();
 
-    vtkIdType numEdges = output->GetNumberOfLines();
-    double prevZ = output->GetPoint(0)[2];
+    vtkIdType numEdges = mesh->GetNumberOfLines();
+    double prevZ = mesh->GetPoint(0)[2];
     int integral = 1;
     for (vtkIdType i = 0; i < numPoints; ++i) {
-        double z = output->GetPoint(i)[2];
+        double z = mesh->GetPoint(i)[2];
         if (z > prevZ) {
             integral++;
         }
@@ -295,7 +295,7 @@ int vtkZipperTriangulation::RequestData(vtkInformation* vtkNotUsed(request),
     int slices_end = v_sliceno->GetValue(numPoints - 1);
     //------------------------------------------------------------------------------------------------------------------------------------------------
     //vtkIdType numEdges = 0;
-    vtkCellArray* lines = output->GetLines();
+    vtkCellArray* lines = mesh->GetLines();
     logfile << "\n num of points  = " << numPoints;
     logfile << "\n num of Vertices = " << numVertices;
     logfile << "\n num of edges   = " << numEdges;
@@ -308,8 +308,8 @@ int vtkZipperTriangulation::RequestData(vtkInformation* vtkNotUsed(request),
     for (vtkIdType e = 0; e < 3 * numEdges; ++e) { e_sliceno->SetValue(e, -1); }
     //------------------------------------------------------------------------------------------------------------------------------------------------ 
     for (vtkIdType e = 0; e < numEdges; e++) { 
-                vtkIdType v1= output->GetCell(e)->GetPointId(0);
-                vtkIdType v2= output->GetCell(e)->GetPointId(1);
+                vtkIdType v1= mesh->GetCell(e)->GetPointId(0);
+                vtkIdType v2= mesh->GetCell(e)->GetPointId(1);
 
                 double v1_slice = v_sliceno->GetValue(v1);
                 double v2_slice = v_sliceno->GetValue(v2);
@@ -375,7 +375,7 @@ int vtkZipperTriangulation::RequestData(vtkInformation* vtkNotUsed(request),
             min_dist = std::numeric_limits<double>::max();
             // Iterate over edges in the next slice to find the nearest one
             for (vtkIdType e2 : edges_up_slice) {
-                double dist = dist_bw_2es(output, e, e2);
+                double dist = dist_bw_2es(mesh, e, e2);
                 if (dist < min_dist) {
                     min_dist = dist;
                     min_dist_edge = e2;
@@ -401,12 +401,14 @@ int vtkZipperTriangulation::RequestData(vtkInformation* vtkNotUsed(request),
 
     //vtkSmartPointer<vtkCellArray> cells = output->GetPolys();
 
-    vtkSmartPointer<vtkCellArray> cells = vtkSmartPointer<vtkCellArray>::New();
-    cells->Allocate(numEdges* 2);
+    // vtkSmartPointer<vtkCellArray> cells = vtkSmartPointer<vtkCellArray>::New();
+    // cells->Allocate(numEdges* 2);
 
 
-    // Clear the cells array before adding new triangles
-    cells->Reset();
+    // // Clear the cells array before adding new triangles
+    // cells->Reset();
+
+    vtkNew<vtkCellArray> cells;
 
     for (vtkIdType s = slices_begin; s < slices_end; s++) {
         const auto& edges_btm_slice = edges_slice_s[s - slices_begin]; 
@@ -418,7 +420,7 @@ int vtkZipperTriangulation::RequestData(vtkInformation* vtkNotUsed(request),
             // Check if e1 and e2 form a valid pair
             if (e2 != -1 && e_btm[e2] == e1) { 
                // Create1Quad(output, e1, e2, 2);
-                Create2Triangles(output, cells, e1, e2, 1);
+                Create2Triangles(mesh, cells, e1, e2, 1);
 
 
             }
@@ -427,18 +429,24 @@ int vtkZipperTriangulation::RequestData(vtkInformation* vtkNotUsed(request),
             }
         }
 
-
         logfile << "\nSlice_" << s;
     }
-
-    output->SetPolys(cells);
 
     //---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- 
         // Close the text file
     logfile.close();
 
 
+    vtkNew<vtkPolyData> final;
+    vtkNew<vtkPoints> points;
+    for (auto k = 0; k < mesh->GetNumberOfPoints(); k++)
+        points->InsertNextPoint(mesh->GetPoint(k));
 
+    final->SetPoints(points);
+    final->SetPolys(cells);
+
+    vtkPolyData* output = vtkPolyData::SafeDownCast(outInfo->Get(vtkDataObject::DATA_OBJECT()));
+    output->ShallowCopy(final);
 
     return 1;
 }
