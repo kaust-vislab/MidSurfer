@@ -81,7 +81,6 @@ bool Create2Triangles(vtkPolyData* mesh, vtkSmartPointer<vtkCellArray> cells, vt
     if (!points) {
         return false;
     }
-
     vtkIdType v1 = mesh->GetCell(e1)->GetPointId(0);
     vtkIdType v2 = mesh->GetCell(e1)->GetPointId(1);
     vtkIdType v3 = mesh->GetCell(e2)->GetPointId(0);
@@ -142,7 +141,11 @@ bool Create2Triangles(vtkPolyData* mesh, vtkSmartPointer<vtkCellArray> cells, vt
             cells->InsertNextCell(3, triangle1);
             cells->InsertNextCell(3, triangle2);
 
+            // Set points and triangles to the polyData 
+
         }
+
+
     }
     else {// opposit direction so dignoal may either be v2v4 OR v1v3 
         double p1p2[3], p3p2[3];
@@ -331,7 +334,7 @@ int vtkZipperTriangulation::RequestData(vtkInformation* vtkNotUsed(request),
 
 
     // Populate the vectors with edge indices based on their slice numbers
-    std::vector<std::vector<vtkIdType>> edges_slice_s(100);
+    std::vector<std::vector<vtkIdType>> edges_slice_s(9000);
 
     // Counter variable to keep track of edge ID within each slice
    // std::vector<size_t> edge_counter(100, 0);
@@ -344,16 +347,16 @@ int vtkZipperTriangulation::RequestData(vtkInformation* vtkNotUsed(request),
         }
     }
 
-    /*  for (vtkIdType s = slices_begin; s < slices_end; s++) {
-          logfile << "Slice " << s << " edges:" << std::endl;
+      //for (vtkIdType s = slices_begin; s <= slices_end; s++) {
+      //   // logfile << "Slice " << s << " edges:" << std::endl;
 
-          const auto& edges = edges_slice_s[s - slices_begin];
-          logfile << "Total = " << edges.size();
-          for (size_t i = 0; i < edges.size(); ++i) {
-              logfile << "e_" << edges[i];
-          }
-          logfile << std::endl;
-      }*/
+      //    const auto& edges = edges_slice_s[s - slices_begin];
+      //    logfile <<"S_"<<s<< "   edges = " << edges.size();
+      //    for (size_t i = 0; i < edges.size(); ++i) {
+      //      //  logfile << "e_" << edges[i];
+      //    }
+      //    logfile << std::endl;
+      //}
       //------------------------------------------------------------------------------------------------------------------------------------------------------
       //e_up start of forward labelling 
       // Create a vector to store the nearest edge indices from the next slice
@@ -385,7 +388,7 @@ int vtkZipperTriangulation::RequestData(vtkInformation* vtkNotUsed(request),
                 e_btm[min_dist_edge] = e;
             }//else it will be a specail case one upper edge has more than one btm edges in nearest --- so we need one triangle instead of 2 
 
-           logfile <<"\nSlice_"<<s<< " =  e_up["<<e<<"]" << e_up[e] << "\t min_dist" << min_dist;
+          // logfile <<"\nSlice_"<<s<< " =  e_up["<<e<<"]" << e_up[e] << "\t min_dist" << min_dist;
         }
     }
 
@@ -396,10 +399,16 @@ int vtkZipperTriangulation::RequestData(vtkInformation* vtkNotUsed(request),
     //----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
     // now it is time to triangulate each pair of edges ebtm and eup //main loop
 
-    vtkSmartPointer<vtkCellArray> cells = output->GetPolys();
-    cells->Allocate(numEdges* 3);
+    //vtkSmartPointer<vtkCellArray> cells = output->GetPolys();
 
-    for (vtkIdType s = slices_begin; s < 16; s++) {
+    vtkSmartPointer<vtkCellArray> cells = vtkSmartPointer<vtkCellArray>::New();
+    cells->Allocate(numEdges* 2);
+
+
+    // Clear the cells array before adding new triangles
+    cells->Reset();
+
+    for (vtkIdType s = slices_begin; s < slices_end; s++) {
         const auto& edges_btm_slice = edges_slice_s[s - slices_begin]; 
 
         for (vtkIdType e1 : edges_btm_slice) {
@@ -409,61 +418,22 @@ int vtkZipperTriangulation::RequestData(vtkInformation* vtkNotUsed(request),
             // Check if e1 and e2 form a valid pair
             if (e2 != -1 && e_btm[e2] == e1) { 
                // Create1Quad(output, e1, e2, 2);
-                Create2Triangles(output, cells, e1, e2, 1); 
+                Create2Triangles(output, cells, e1, e2, 1);
+
+
             }
             else {
                 // Handle the case where e1 and e2 do not form a valid pair
             }
         }
+
+
+        logfile << "\nSlice_" << s;
     }
 
-    //----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+    output->SetPolys(cells);
 
-
-
-
-
-
-    //---------------------------------------------------------
-//-----------------------------------------------------------------------------------------------------------------------------------------------------------------
-//    The following loop is used to label each edge with e_btm and e_up being its two neares edges from the neibhouring slices  
-   //for (vtkIdType s = slices_begin; s < slices_end; s++) {
-   //    int count = 0;
-   //    double davg = 0.0;  
-   //    for (vtkIdType e = 0; e < numEdges; e++) {
-   //        vtkIdType i = e * 3;
-   //        if (e_sliceno->GetValue(i) != s)
-   //            continue;
-   //        double mind2 = std::numeric_limits<double>::max();
-
-   //        for (vtkIdType e2 = 0; e2 < numEdges; e2++) {
-   //            vtkIdType i2 = e2 * 3;
-   //            if (e_sliceno->GetValue(i2) != s+1)
-   //                continue;
-   //            double de2 = dist_bw_2es(output, i, i2);
-
-   //           // logfile << "\n   Slice # [" << s << "] de2= " << de2;
-   //            if (mind2 > de2)
-   //            {
-   //                mind2 = de2; 
-   //               // e_up[e] = e2; 
-   //            }
-
-   //        }
-
-   //        davg += mind2;
-   //        count++;
-   //    }
-   //    if(count>0)
-   //    davg /= count;
-
-   //    logfile << "\n   Slice # [" << s << "] davg= " << davg;
-   //    logfile << "\n   Slice # [" << s << "] count= " << count;
-
-   //}
-       //-----------------------------------------------------------------------------------------------------------------------------------------------------------------
-
-
+    //---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- 
         // Close the text file
     logfile.close();
 
