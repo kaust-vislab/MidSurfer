@@ -25,6 +25,14 @@
 #include <vtkQuad.h> 
 
 
+#include <vtkSmartPointer.h>
+#include <vtkPolyData.h>
+#include <vtkCellData.h>
+#include <vtkPointData.h>
+#include <vtkPolyDataNormals.h>
+
+#include <cmath>
+
 
 
 vtkStandardNewMacro(vtkZipperTriangulation);
@@ -45,6 +53,45 @@ vtkZipperTriangulation::~vtkZipperTriangulation()
 
     vtkVLog(PARAVIEW_LOG_PLUGIN_VERBOSITY(), ":vtkZipperTriangulation:~vtkZipperTriangulation() END");
 }
+
+
+//--------------------------------------------------------------------------------------------------------------------------------
+vtkIdType NearestVertex2Mid(vtkPolyData* mesh, vtkIdType v1_e1, vtkIdType v2_e1, vtkIdType e2) {
+    vtkPoints* points = mesh->GetPoints();
+    if (!points) {
+        return 0.0;
+    }
+
+    // Get vertex IDs of the two edges 
+    vtkIdType v1_e2 = mesh->GetCell(e2)->GetPointId(0);
+    vtkIdType v2_e2 = mesh->GetCell(e2)->GetPointId(1);
+
+    // Calculate midpoint of the two edges
+    double p1[3], p2[3], p3[3];
+    for (int i = 0; i < 3; ++i) {
+        p1[i] = (points->GetPoint(v1_e1)[i] + points->GetPoint(v2_e1)[i]) / 2.0;
+        p2[i] = points->GetPoint(v1_e2)[i];
+        p3[i] = points->GetPoint(v2_e2)[i];
+    }
+
+
+    // Calculate distance between midpoints
+    double d1 = 0;
+    double d2 = 0;
+    for (int i = 0; i < 3; ++i) {
+        d1 += (p1[i] - p2[i]) * (p1[i] - p2[i]);
+        d2 += (p1[i] - p3[i]) * (p1[i] - p3[i]);
+    }
+    if (d1 > d2)
+    {
+        return v1_e2;
+    }
+    else {
+        return v2_e2;
+
+    }
+}
+
 //--------------------------------------------------------------------------------------------------------------------------------
 double dist_bw_2es(vtkPolyData* mesh, vtkIdType e1, vtkIdType e2) {
     vtkPoints* points = mesh->GetPoints();
@@ -72,6 +119,106 @@ double dist_bw_2es(vtkPolyData* mesh, vtkIdType e1, vtkIdType e2) {
     }
     return sqrt(d1);
 }
+//...........................................................................................................................  .......................  .......................  .......................  
+bool Create1Triangle(vtkPolyData* mesh, vtkSmartPointer<vtkCellArray> cells, vtkIdType e1, vtkIdType e2, double d) {
+    //we can use d for avoiding triangles with longer edges 
+    /*if (dist_bw_2es(mesh, e1, e2) > d)
+        return false;*/
+    vtkPoints* points = mesh->GetPoints();
+    if (!points) {
+        return false;
+    }
+    vtkIdType v1 = mesh->GetCell(e1)->GetPointId(0);
+    vtkIdType v2 = mesh->GetCell(e1)->GetPointId(1);
+    vtkIdType v3 = NearestVertex2Mid(mesh, v1, v2, e2);
+    vtkIdType triangle1[3] = { v1, v2, v3 };
+    cells->InsertNextCell(3, triangle1);
+    return true;
+}
+//===================================================================
+void Cross(const double v1[3], const double v2[3], double result[3]) {
+result[0] = v1[1] * v2[2] - v1[2] * v2[1];
+result[1] = v1[2] * v2[0] - v1[0] * v2[2];
+result[2] = v1[0] * v2[1] - v1[1] * v2[0];
+}
+
+void Subtract(const double v1[3], const double v2[3], double result[3]) {
+    for (int i = 0; i < 3; ++i) {
+        result[i] = v1[i] - v2[i];
+    }
+}
+
+double Dot(const double v1[3], const double v2[3]) {
+    double dotProduct = 0.0;
+    for (int i = 0; i < 3; ++i) {
+        dotProduct += v1[i] * v2[i];
+    }
+    return dotProduct;
+}
+//------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+bool Create2TrianglesDD(vtkPolyData* mesh, vtkSmartPointer<vtkCellArray> cells, vtkIdType e1, vtkIdType e2, double d) {
+    // Retrieve points from the mesh
+    vtkPoints* points = mesh->GetPoints();
+    if (!points) {
+        return false;
+    }
+
+    // Get the indices of the vertices connected by edges e1 and e2
+    vtkIdType v1 = mesh->GetCell(e1)->GetPointId(0);
+    vtkIdType v2 = mesh->GetCell(e1)->GetPointId(1);
+    vtkIdType v3 = mesh->GetCell(e2)->GetPointId(0);
+    vtkIdType v4 = mesh->GetCell(e2)->GetPointId(1);
+
+    // Calculate vectors for each edge
+    double p1[3], p2[3], p3[3], p4[3];
+    points->GetPoint(v1, p1);
+    points->GetPoint(v2, p2);
+    points->GetPoint(v3, p3);
+    points->GetPoint(v4, p4);
+
+    // Calculate the difference vectors
+    double s1[3], s2[3];
+    Subtract(p2, p1, s1);
+    Subtract(p3, p2, s2);
+
+    // Calculate the dot products
+    double dotProduct1 = Dot(s1, s1);
+    double dotProduct2 = Dot(s2, s2);
+
+
+    vtkIdType triangle1[3], triangle2[3];
+
+    // Adjust the face orientations if necessary
+    if (dotProduct1 > 0 && dotProduct2 > 0) { // Both cross products point outward
+        // Define triangles with counterclockwise winding order
+        triangle1[0] = v1; triangle1[1] = v2; triangle1[2] = v3;
+        triangle2[0] = v4; triangle2[1] = v3; triangle2[2] = v2;
+    }
+    else if (dotProduct1 < 0 && dotProduct2 < 0) { // Both cross products point inward
+     // Define triangles with counterclockwise winding order
+        triangle1[0] = v2; triangle1[1] = v1; triangle1[2] = v4;
+        triangle2[0] = v1; triangle2[1] = v3; triangle2[2] = v4;
+    }
+    else { // Adjust one triangle to ensure consistent face orientations
+        if (dotProduct1 < 0) { // Cross product 1 points inward
+            // Define triangles with counterclockwise winding order
+            triangle1[0] = v1; triangle1[1] = v2; triangle1[2] = v3;
+            triangle2[0] = v4; triangle2[1] = v3; triangle2[2] = v2;
+        }
+        else { // Cross product 2 points inward
+         // Define triangles with counterclockwise winding order
+            triangle1[0] = v2; triangle1[1] = v1; triangle1[2] = v4;
+            triangle2[0] = v1; triangle2[1] = v3; triangle2[2] = v4;
+        }
+    }
+
+    // Insert triangles into the cell array
+    cells->InsertNextCell(3, triangle1);
+    cells->InsertNextCell(3, triangle2);
+
+    return true;
+}
+
 //...........................................................................................................................  
 bool Create2Triangles(vtkPolyData* mesh, vtkSmartPointer<vtkCellArray> cells, vtkIdType e1, vtkIdType e2, double d) {
     //we can use d for avoiding triangles with longer edges 
@@ -111,8 +258,8 @@ bool Create2Triangles(vtkPolyData* mesh, vtkSmartPointer<vtkCellArray> cells, vt
     // Check the direction of edges e1 and e2
     double dotProduct = vtkMath::Dot(dir1, dir2);
     //vtkSmartPointer<vtkCellArray> cells = mesh->GetPolys();
-
-    if (dotProduct > 0) { 
+    if (dotProduct > 0) { // Case 1 and Case 2
+         
         double p1p2[3], p4p2[3];
         for (int i = 0; i < 3; ++i) {
             p1p2[i] = p1[i] - p2[i];
@@ -128,26 +275,32 @@ bool Create2Triangles(vtkPolyData* mesh, vtkSmartPointer<vtkCellArray> cells, vt
         double v1v2v4 = vtkMath::AngleBetweenVectors(p1p2, p4p2);//angle at v2 
         //This calculates the angle at vertex v2 using the vectors from v1 to v2 and from v2 to v4.
         double v2v1v3 = vtkMath::AngleBetweenVectors(p2p1, p3p1);//angle at v1
-        if (v1v2v4 > v2v1v3) {  
-            vtkIdType triangle1[3] = { v1, v2, v3 };
-            vtkIdType triangle2[3] = { v2, v3, v4 };
-            cells->InsertNextCell(3,triangle1);
-            cells->InsertNextCell(3, triangle2);
-
+        if (v1v2v4 > v2v1v3) { // Case 1
+            /*if (p1[0] <p2[0])
+            {*/
+                vtkIdType triangle1[3] = { v1, v2, v3 };  // Counterclockwise order
+                vtkIdType triangle2[3] = { v4, v3, v2 };  // Counterclockwise order
+                cells->InsertNextCell(3, triangle1);
+                cells->InsertNextCell(3, triangle2);
+            //}
+            //else
+            //{ 
+            //    vtkIdType triangle1[3] = { v2, v1, v3 };  // Counterclockwise order
+            //    vtkIdType triangle2[3] = { v3, v4, v2 };  // Counterclockwise order
+            //    cells->InsertNextCell(3, triangle1);
+            //    cells->InsertNextCell(3, triangle2);
+            //}
+           // vtkIdType triangle2[3] = { v4 ,v2, v3};  // dd
         }
-        else {
-            vtkIdType triangle1[3] = { v1, v2, v4 };
-            vtkIdType triangle2[3] = { v1, v3, v4 }; 
+        else { // Case 2 
+            vtkIdType triangle1[3] = { v2, v1, v4 };  // Counterclockwise order
+            vtkIdType triangle2[3] = { v1, v3, v4 };  // Counterclockwise order
             cells->InsertNextCell(3, triangle1);
             cells->InsertNextCell(3, triangle2);
-
-            // Set points and triangles to the polyData 
-
         }
-
-
     }
-    else {// opposit direction so dignoal may either be v2v4 OR v1v3 
+    else { // Case 3 and Case 4
+        // opposit direction so dignoal may either be v2v4 OR v1v3  
         double p1p2[3], p3p2[3];
         for (int i = 0; i < 3; ++i) {
             p1p2[i] = p1[i] - p2[i];
@@ -162,29 +315,96 @@ bool Create2Triangles(vtkPolyData* mesh, vtkSmartPointer<vtkCellArray> cells, vt
 
         double v1v2v3 = vtkMath::AngleBetweenVectors(p1p2, p3p2);//angle at v2
         double v2v1v4 = vtkMath::AngleBetweenVectors(p2p1,p4p1);//angle at v1
-
-        if (v1v2v3 > v2v1v4) { 
-            vtkIdType triangle1[3] = { v1, v2, v4 };
-            vtkIdType triangle2[3] = { v2, v3, v4 };
-
+        if (v1v2v3 > v2v1v4) { // Case 3
+            vtkIdType triangle1[3] = { v2, v1, v4 };  // Counterclockwise order
+            vtkIdType triangle2[3] = { v3, v2, v4 };  // Counterclockwise order
             cells->InsertNextCell(3, triangle1);
             cells->InsertNextCell(3, triangle2);
-
-
         }
-        else
-        { 
-            vtkIdType triangle1[3] = { v1, v2, v3 };
-            vtkIdType triangle2[3] = { v1, v3, v4 };
-
+        else { // Case 4
+            vtkIdType triangle1[3] = { v2, v1, v3 };  // Counterclockwise order
+            vtkIdType triangle2[3] = { v1, v4, v3 };  // Counterclockwise order
             cells->InsertNextCell(3, triangle1);
             cells->InsertNextCell(3, triangle2);
-
-        } 
+        }
     }
-     
+
     return true;
 }
+
+//    if (dotProduct > 0) { 
+//        double p1p2[3], p4p2[3];
+//        for (int i = 0; i < 3; ++i) {
+//            p1p2[i] = p1[i] - p2[i];
+//            p4p2[i] = p4[i] - p2[i];
+//        }
+//        double p2p1[3], p3p1[3];
+//        for (int i = 0; i < 3; ++i) {
+//            p2p1[i] = p2[i] - p1[i];
+//            p3p1[i] = p3[i] - p1[i];
+//        }
+//
+//
+//        double v1v2v4 = vtkMath::AngleBetweenVectors(p1p2, p4p2);//angle at v2 
+//        //This calculates the angle at vertex v2 using the vectors from v1 to v2 and from v2 to v4.
+//        double v2v1v3 = vtkMath::AngleBetweenVectors(p2p1, p3p1);//angle at v1
+//        if (v1v2v4 > v2v1v3) {  
+//            vtkIdType triangle1[3] = { v1, v2, v3 };
+//            vtkIdType triangle2[3] = { v4, v3, v2 };
+//            cells->InsertNextCell(3,triangle1);
+//            cells->InsertNextCell(3, triangle2);
+//
+//        }
+//        else {
+//            vtkIdType triangle1[3] = { v2, v1, v4 };
+//            vtkIdType triangle2[3] = { v1, v3, v4 }; 
+//            cells->InsertNextCell(3, triangle1);
+//            cells->InsertNextCell(3, triangle2);
+//
+//            // Set points and triangles to the polyData 
+//
+//        }
+//
+//
+//    }
+//    else {// opposit direction so dignoal may either be v2v4 OR v1v3 
+//        double p1p2[3], p3p2[3];
+//        for (int i = 0; i < 3; ++i) {
+//            p1p2[i] = p1[i] - p2[i];
+//            p3p2[i] = p3[i] - p2[i];
+//        }
+//        double p2p1[3], p4p1[3];
+//        for (int i = 0; i < 3; ++i) {
+//            p2p1[i] = p2[i] - p1[i];
+//            p4p1[i] = p4[i] - p1[i];
+//        }
+//
+//
+//        double v1v2v3 = vtkMath::AngleBetweenVectors(p1p2, p3p2);//angle at v2
+//        double v2v1v4 = vtkMath::AngleBetweenVectors(p2p1,p4p1);//angle at v1
+//
+//        if (v1v2v3 > v2v1v4) { 
+//            vtkIdType triangle1[3] = { v2, v1, v4 };
+//            vtkIdType triangle2[3] = { v3, v2, v4 };
+//
+//            cells->InsertNextCell(3, triangle1);
+//            cells->InsertNextCell(3, triangle2);
+//
+//
+//        }
+//        else
+//        { 
+//            vtkIdType triangle1[3] = { v2, v1, v3 };
+//            vtkIdType triangle2[3] = { v1, v4, v3 };
+//
+//            cells->InsertNextCell(3, triangle1);
+//            cells->InsertNextCell(3, triangle2);
+//
+//        } 
+//    }
+//     
+//    return true;
+//}
 //-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 bool Create1Quad(vtkPolyData* mesh, vtkIdType e1, vtkIdType e2, double d) {
     vtkPoints* points = mesh->GetPoints();
@@ -245,6 +465,35 @@ bool Create1Quad(vtkPolyData* mesh, vtkIdType e1, vtkIdType e2, double d) {
     return true;
 }
 
+//void EnsureOutwardNormals(vtkPolyData* mesh) {
+//    // Compute normals
+//    vtkSmartPointer<vtkPolyDataNormals> normalGenerator = vtkSmartPointer<vtkPolyDataNormals>::New();
+//    normalGenerator->SetInputData(mesh);
+//    normalGenerator->ComputePointNormalsOff();
+//    normalGenerator->ComputeCellNormalsOn();
+//    normalGenerator->Update();
+//
+//    // Get the computed normals
+//    vtkDataArray* normals = normalGenerator->GetOutput()->GetCellData()->GetNormals();
+//
+//    // Loop through each triangle
+//    vtkSmartPointer<vtkCellArray> cells = mesh->GetPolys();
+//    cells->InitTraversal();
+//    vtkSmartPointer<vtkIdList> cellPoints = vtkSmartPointer<vtkIdList>::New();
+//    while (cells->GetNextCell(cellPoints)) {
+//        double normal[3];
+//        normals->GetTuple(cells->GetTraversalLocation(), normal);
+//
+//        // Check if the normal points inward
+//        if (normal[2] < 0) { // Assuming the cylinder is oriented along the z-axis
+//            // Swap the vertices of the triangle
+//            vtkIdType tmp = cellPoints->GetId(0);
+//            cellPoints->SetId(0, cellPoints->GetId(2));
+//            cellPoints->SetId(2, tmp);
+//            mesh->ReplaceCell(cells->GetTraversalLocation(), cellPoints);
+//        }
+//    }
+//}
 
 //-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 int vtkZipperTriangulation::RequestData(vtkInformation* vtkNotUsed(request),
@@ -426,12 +675,13 @@ int vtkZipperTriangulation::RequestData(vtkInformation* vtkNotUsed(request),
             }
             else {
                 // Handle the case where e1 and e2 do not form a valid pair
+                Create1Triangle(mesh, cells, e1, e2, 1);
+
             }
         }
 
         logfile << "\nSlice_" << s;
     }
-
     //---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- 
         // Close the text file
     logfile.close();
@@ -445,6 +695,8 @@ int vtkZipperTriangulation::RequestData(vtkInformation* vtkNotUsed(request),
     final->SetPoints(points);
     final->SetPolys(cells);
 
+   // EnsureOutwardNormals(final);
+     
     vtkPolyData* output = vtkPolyData::SafeDownCast(outInfo->Get(vtkDataObject::DATA_OBJECT()));
     output->ShallowCopy(final);
 
