@@ -714,6 +714,9 @@ int vtkZipperTriangulation::RequestData(vtkInformation* vtkNotUsed(request),
 
     // Populate the vectors with edge indices based on their slice numbers
     std::vector<std::vector<vtkIdType>> edges_slice_s(9000);
+    std::vector<double> slice_avg_width(9000, 0);//to store average 
+    std::vector<int> slice_validpairs_count(9000, 0);//to store average 
+    
 
     // Counter variable to keep track of edge ID within each slice
    // std::vector<size_t> edge_counter(100, 0);
@@ -761,13 +764,20 @@ int vtkZipperTriangulation::RequestData(vtkInformation* vtkNotUsed(request),
                 }
             }
             e_up[e] = min_dist_edge;
-            if (e_upd[min_dist_edge] > min_dist)
+            if (e_upd[min_dist_edge] > min_dist)//valid pair found 
             {
                 e_upd[min_dist_edge] = min_dist;
                 e_btm[min_dist_edge] = e;
+                slice_avg_width[s]+= min_dist;
+                slice_validpairs_count[s]++;
             }//else it will be a specail case one upper edge has more than one btm edges in nearest --- so we need one triangle instead of 2 
 
           // logfile <<"\nSlice_"<<s<< " =  e_up["<<e<<"]" << e_up[e] << "\t min_dist" << min_dist;
+        }
+
+        if (slice_validpairs_count[s]>0)
+        {
+            slice_avg_width[s] /= slice_validpairs_count[s];
         }
     }
 
@@ -777,6 +787,7 @@ int vtkZipperTriangulation::RequestData(vtkInformation* vtkNotUsed(request),
     //----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
     //----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
     // now it is time to triangulate each pair of edges ebtm and eup //main loop 
+    double zipper_alfa = 1.1;
     vtkNew<vtkCellArray> cells;
      
     for (vtkIdType s = slices_begin; s < slices_end; s++) {
@@ -789,6 +800,7 @@ int vtkZipperTriangulation::RequestData(vtkInformation* vtkNotUsed(request),
             // Check if e1 and e2 form a valid pair
             if (e2 != -1 && e_btm[e2] == e1) {
                 // Create1Quad(output, e1, e2, 2);
+                if (e_upd[e2] < zipper_alfa * slice_avg_width[s])
                 Create2Triangles(mesh, cells, e1, e2, 1);
 
 
@@ -796,8 +808,11 @@ int vtkZipperTriangulation::RequestData(vtkInformation* vtkNotUsed(request),
             else {
                 // Handle the case where e1 and e2 do not form a valid pair
                 if (e2 != -1 && e_btm[e2] != -1) {//bottom to up single trinagles filling 
-                    if(1.2*e_upd[e2]>dist_bw_2es(mesh, e1, e2))
+                    //if(1.2*e_upd[e2]>dist_bw_2es(mesh, e1, e2))
+                    if (zipper_alfa * slice_avg_width[s] > dist_bw_2es(mesh, e1, e2)) 
+                    {
                     Create1Triangle(mesh, cells, e1, e2, e_btm[e2], 1);
+                    }
 
                 }
 
@@ -829,8 +844,12 @@ int vtkZipperTriangulation::RequestData(vtkInformation* vtkNotUsed(request),
                 }
                 vtkIdType e2adj = e_up[e_btm[e2]];
                 if (e2adj != -1) {
-                    if ( e_upd[e2] < 1.2 * dist_bw_2es(mesh, e2adj, e_btm[e2adj]))
-                    Create1Triangle(mesh, cells, e2, e_btm[e2], e2adj, 1);
+                   // if ( e_upd[e2] < 1.2 * dist_bw_2es(mesh, e2adj, e_btm[e2adj]))
+
+                        if (e_upd[e2] <zipper_alfa * slice_avg_width[s])
+                        {
+                            Create1Triangle(mesh, cells, e2, e_btm[e2], e2adj, 1);
+                        }
                 }
 
 
