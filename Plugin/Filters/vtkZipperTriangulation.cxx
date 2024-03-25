@@ -694,17 +694,7 @@ int vtkZipperTriangulation::RequestData(vtkInformation* vtkNotUsed(request),
     //----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
     //----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
     //----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
-    // now it is time to triangulate each pair of edges ebtm and eup //main loop
-
-    //vtkSmartPointer<vtkCellArray> cells = output->GetPolys();
-
-    // vtkSmartPointer<vtkCellArray> cells = vtkSmartPointer<vtkCellArray>::New();
-    // cells->Allocate(numEdges* 2);
-
-
-    // // Clear the cells array before adding new triangles
-    // cells->Reset();
-
+    // now it is time to triangulate each pair of edges ebtm and eup //main loop 
     vtkNew<vtkCellArray> cells;
 
     for (vtkIdType s = slices_begin; s < slices_end; s++) {
@@ -723,7 +713,7 @@ int vtkZipperTriangulation::RequestData(vtkInformation* vtkNotUsed(request),
             }
             else {
                 // Handle the case where e1 and e2 do not form a valid pair
-                if (e2 != -1&& e_btm[e2] != -1) {
+                if (e2 != -1&& e_btm[e2] != -1) {//bottom to up single trinagles filling 
 
                     Create1Triangle(mesh, cells, e1, e2, e_btm[e2], 1);
                 
@@ -731,6 +721,37 @@ int vtkZipperTriangulation::RequestData(vtkInformation* vtkNotUsed(request),
 
             }
         }
+
+
+        //--------------------------------------------------------------- top to bottom single triangle filling------------------------------
+
+        const auto& edges_up_slice = edges_slice_s[s - slices_begin+1];
+        for (vtkIdType e2 : edges_up_slice) {
+            if (e_btm[e2]==-1)
+            {
+
+                vtkIdType min_dist_edge = -1; // Initialize with -1 indicating no nearest edge found
+                double min_dist = std::numeric_limits<double>::max();
+                // Iterate over edges in the next slice to find the nearest one
+                for (vtkIdType e1 : edges_btm_slice) {
+                    double dist = dist_bw_2es(mesh, e1, e2);
+                    if (dist < min_dist) {
+                        min_dist = dist;
+                        min_dist_edge = e1;
+                    }
+                }
+                e_btm[e2] = min_dist_edge; 
+                vtkIdType e2adj = e_up[e_btm[e2]];
+                if (e2adj != -1) {
+                    Create1Triangle(mesh, cells, e2, e_btm[e2], e2adj, 1); 
+                }
+
+
+            }
+        
+        }
+        
+    //---------------------------------------------------------------
 
         logfile << "\nSlice_" << s;
     }
