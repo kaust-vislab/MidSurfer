@@ -56,6 +56,43 @@ vtkZipperTriangulation::~vtkZipperTriangulation()
 
 
 //--------------------------------------------------------------------------------------------------------------------------------
+vtkIdType NearestVertex2v(vtkPolyData* mesh, vtkIdType v1_e1, vtkIdType e2) {
+    vtkPoints* points = mesh->GetPoints();
+    if (!points) {
+        return 0.0;
+    }
+
+    // Get vertex IDs of the two edges 
+    vtkIdType v1_e2 = mesh->GetCell(e2)->GetPointId(0);
+    vtkIdType v2_e2 = mesh->GetCell(e2)->GetPointId(1);
+
+    // Calculate midpoint of the two edges
+    double p1[3], p2[3], p3[3];
+    for (int i = 0; i < 3; ++i) {
+        p1[i] = points->GetPoint(v1_e1)[i];
+        p2[i] = points->GetPoint(v1_e2)[i];
+        p3[i] = points->GetPoint(v2_e2)[i];
+    }
+
+
+    // Calculate distance between midpoints
+    double d1 = 0;
+    double d2 = 0;
+    for (int i = 0; i < 3; ++i) {
+        d1 += (p1[i] - p2[i]) * (p1[i] - p2[i]);
+        d2 += (p1[i] - p3[i]) * (p1[i] - p3[i]);
+    }
+    if (d1 < d2)
+    {
+        return v1_e2;
+    }
+    else {
+        return v2_e2;
+
+    }
+}
+
+//--------------------------------------------------------------------------------------------------------------------------------
 vtkIdType NearestVertex2Mid(vtkPolyData* mesh, vtkIdType v1_e1, vtkIdType v2_e1, vtkIdType e2) {
     vtkPoints* points = mesh->GetPoints();
     if (!points) {
@@ -82,7 +119,7 @@ vtkIdType NearestVertex2Mid(vtkPolyData* mesh, vtkIdType v1_e1, vtkIdType v2_e1,
         d1 += (p1[i] - p2[i]) * (p1[i] - p2[i]);
         d2 += (p1[i] - p3[i]) * (p1[i] - p3[i]);
     }
-    if (d1 > d2)
+    if (d1 < d2)
     {
         return v1_e2;
     }
@@ -120,7 +157,7 @@ double dist_bw_2es(vtkPolyData* mesh, vtkIdType e1, vtkIdType e2) {
     return sqrt(d1);
 }
 //...........................................................................................................................  .......................  .......................  .......................  
-bool Create1Triangle(vtkPolyData* mesh, vtkSmartPointer<vtkCellArray> cells, vtkIdType e1, vtkIdType e2, double d) {
+bool Create1Triangle(vtkPolyData* mesh, vtkSmartPointer<vtkCellArray> cells, vtkIdType e1, vtkIdType e2, vtkIdType e2btm, double d) {
     //we can use d for avoiding triangles with longer edges 
     /*if (dist_bw_2es(mesh, e1, e2) > d)
         return false;*/
@@ -129,9 +166,20 @@ bool Create1Triangle(vtkPolyData* mesh, vtkSmartPointer<vtkCellArray> cells, vtk
         return false;
     }
     vtkIdType v1 = mesh->GetCell(e1)->GetPointId(0);
-    vtkIdType v2 = mesh->GetCell(e1)->GetPointId(1);
-    vtkIdType v3 = NearestVertex2Mid(mesh, v1, v2, e2);
-    vtkIdType triangle1[3] = { v1, v2, v3 };
+    vtkIdType v2c = mesh->GetCell(e1)->GetPointId(1);
+
+    //v2c is supposed to be common vertex beween e1 and e2btm 
+    vtkIdType v1n = mesh->GetCell(e2btm)->GetPointId(0);
+    vtkIdType v2n = mesh->GetCell(e2btm)->GetPointId(1);
+    if (v1n==v1||v2n==v1)
+    {
+        vtkIdType v1t = v2c;
+        v2c = v1;
+        v1 = v1t;//swaping 
+    }
+
+    vtkIdType v3 = NearestVertex2v(mesh, v1, e2);
+    vtkIdType triangle1[3] = { v1, v2c, v3 };
     cells->InsertNextCell(3, triangle1);
     return true;
 }
@@ -675,7 +723,11 @@ int vtkZipperTriangulation::RequestData(vtkInformation* vtkNotUsed(request),
             }
             else {
                 // Handle the case where e1 and e2 do not form a valid pair
-                Create1Triangle(mesh, cells, e1, e2, 1);
+                if (e2 != -1&& e_btm[e2] != -1) {
+
+                    Create1Triangle(mesh, cells, e1, e2, e_btm[e2], 1);
+                
+                }
 
             }
         }
