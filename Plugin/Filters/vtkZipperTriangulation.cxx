@@ -787,7 +787,7 @@ int vtkZipperTriangulation::RequestData(vtkInformation* vtkNotUsed(request),
     //----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
     //----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
     // now it is time to triangulate each pair of edges ebtm and eup //main loop 
-    double zipper_alfa = 1.1;
+    double zipper_alfa = this->ZipperAlpha;
     vtkNew<vtkCellArray> cells;
      
     for (vtkIdType s = slices_begin; s < slices_end; s++) {
