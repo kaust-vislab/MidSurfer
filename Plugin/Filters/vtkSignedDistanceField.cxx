@@ -33,7 +33,7 @@
 vtkStandardNewMacro(vtkSignedDistanceField);
 
 vtkSignedDistanceField::vtkSignedDistanceField()
-	: InputArray(nullptr), FinalResultName(nullptr) {
+	: InputArray(nullptr), SDFResultName(nullptr), FinalResultName(nullptr) {
 	this->SetNumberOfInputPorts(1);
 	this->SetNumberOfOutputPorts(1);
 }
