@@ -807,14 +807,14 @@ int vtkZipperTriangulation::RequestData(vtkInformation* vtkNotUsed(request),
             // Check if e1 and e2 form a valid pair
             if (e2 != -1 && e_btm[e2] == e1) {
                 // Create1Quad(output, e1, e2, 2);
-               // if (e_upd[e2] < zipper_alfa * slice_avg_width[s])
+               if (e_upd[e2] < zipper_alfa * slice_avg_width[s])
                 Create2Triangles(mesh, cells, e1, e2, 1); 
             }
             else {
                 // Handle the case where e1 and e2 do not form a valid pair
                 if (e2 != -1 && e_btm[e2] != -1) {//bottom to up single trinagles filling  
-                   // if (zipper_alfa * slice_avg_width[s] > dist_bw_2es(mesh, e1, e2)) 
-                    if (zipper_alfa * e_upd[e2] > dist_bw_2es(mesh, e1, e2))
+                   //if (zipper_alfa * e_upd[e2] > dist_bw_2es(mesh, e1, e2))
+                    if (zipper_alfa * slice_avg_width[s] > dist_bw_2es(mesh, e1, e2))
                     {
                     Create1Triangle(mesh, cells, e1, e2, e_btm[e2], 1);
                     }
@@ -849,10 +849,9 @@ int vtkZipperTriangulation::RequestData(vtkInformation* vtkNotUsed(request),
                 }
                 vtkIdType e2adj = e_up[e_btm[e2]];
                 if (e2adj != -1 && e_btm[e2adj]!=-1) {
-                   // if ( e_upd[e2] < 1.2 * dist_bw_2es(mesh, e2adj, e_btm[e2adj]))
-
-                        //if (e_upd[e2] <zipper_alfa * slice_avg_width[s])
-                    if (e_upd[e2] < zipper_alfa* dist_bw_2es(mesh, e2adj, e_btm[e2adj]))
+                   // if ( e_upd[e2] < 1.2 * dist_bw_2es(mesh, e2adj, e_btm[e2adj])) 
+                    //if (e_upd[e2] < zipper_alfa* dist_bw_2es(mesh, e2adj, e_btm[e2adj]))
+                    if (e_upd[e2] < zipper_alfa * slice_avg_width[s])
                         {
                             Create1Triangle(mesh, cells, e2, e_btm[e2], e2adj, 1);
                         }
