@@ -209,7 +209,7 @@ void vtkExtractMidsurface::FindLabelExtent(int *labelExtent, int *extent, vtkIma
 		for (int y = extent[2]; y < extent[3]; y++)
 			for (int x = extent[0]; x < extent[1]; x++)
 			{
-				if (*((double *)(image->GetScalarPointer(x, y, z))) > 0)
+				if (*((double *)(image->GetScalarPointer(x - extent[0], y - extent[2], z - extent[4]))) > 0)
 				{
 					if (x < labelExtent[0])
 						labelExtent[0] = x;
