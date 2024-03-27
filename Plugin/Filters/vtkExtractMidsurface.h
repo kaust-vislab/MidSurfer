@@ -102,13 +102,16 @@ public:
 	vtkSetMacro(Connectivity, unsigned int);
 	vtkGetMacro(Connectivity, unsigned int);
 
+	vtkSetMacro(LabelExtentBorder, int);
+	vtkGetMacro(LabelExtentBorder, int);
+
 protected:
 	vtkExtractMidsurface();
 	~vtkExtractMidsurface();
 
-	int RequestData(vtkInformation *, vtkInformationVector **, vtkInformationVector *) override;
-	int RequestInformation(vtkInformation *vtkNotUsed(request), vtkInformationVector **inputVector, vtkInformationVector *outputVector) override;
-	int FillOutputPortInformation(int, vtkInformation *) override;
+    int RequestData(vtkInformation *, vtkInformationVector **, vtkInformationVector *) override;
+    int RequestInformation(vtkInformation *vtkNotUsed(request), vtkInformationVector **inputVector, vtkInformationVector *outputVector) override;
+    int FillOutputPortInformation(int, vtkInformation *) override;
 
 private:
 	vtkExtractMidsurface(const vtkExtractMidsurface &) = delete;
@@ -117,6 +120,7 @@ private:
 	void ComputeGaussianSmoothing(vtkImageData *image);
 	void ComputeSmoothSignedDistanceMap(vtkImageData *image);
 	void ExtractMidsurface(vtkImageData *image, vtkAppendPolyData *append, int *dims);
+    void FindLabelExtent(int *labelExtent, int *extent, vtkImageData *image);
 
 	// std::vector<vtkExtractCenterLine*> centerlines;
 
@@ -134,6 +138,7 @@ private:
 	bool GoldenSectionSearch;
 	bool ShapeDetection;
 	double Tolerance;
+	int LabelExtentBorder;
 
 	// SDF parameters
 	unsigned int DistanceType; // 1 - 2D, 2 - 3D

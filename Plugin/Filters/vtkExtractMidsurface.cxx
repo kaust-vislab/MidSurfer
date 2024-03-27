@@ -39,6 +39,7 @@
 
 #include <chrono>
 #include <numbers>
+#include <algorithm>
 
 #define SHFT2(a, b, c) \
 	(a) = (b);         \
@@ -122,29 +123,44 @@ int vtkExtractMidsurface::RequestData(vtkInformation *vtkNotUsed(request),
 	image->DeepCopy(input); // for initilaization
 
 	int dims[3];
+	int extent[6];
 	double spacing[3];
 	double bounds[6];
 
 	image->GetDimensions(dims);
 	image->GetSpacing(spacing);
 	image->GetBounds(bounds); // not used...
-	
-	this->SetProgressText("Computing step size.");
+	image->GetExtent(extent);
+
+	this->SetProgressText("Computing VOI.");
 	this->UpdateProgress(0.000001);
+
+	int labelExtent[6];
+    FindLabelExtent(labelExtent, extent, image);
+
+    vtkNew<vtkExtractVOI> extractVOI;
+	extractVOI->SetInputData(image);
+	extractVOI->SetVOI(labelExtent[0], labelExtent[1], labelExtent[2], labelExtent[3], labelExtent[4], labelExtent[5]);
+	extractVOI->Update();
+
+	auto voi = extractVOI->GetOutput();
+
+	this->SetProgressText("Computing step size.");
+	this->UpdateProgress(0.000002);
 
 	if (this->AutomaticStepSize)
 		this->IntegrationStep = std::numbers::sqrt2 * spacing[2];
 
 	this->SetProgressText("Computing smoothed signed distance map.");
-	this->UpdateProgress(0.000002);
+	this->UpdateProgress(0.000003);
 
 	if (this->SmoothInput == SMOOTH_INPUT_GAUSSIAN_3D)
 	{
-		ComputeGaussianSmoothing(image);
+		ComputeGaussianSmoothing(voi);
 	}
 	else if (this->SmoothInput == SMOOTH_INPUT_SDF_3D)
 	{
-		ComputeSmoothSignedDistanceMap(image);
+		ComputeSmoothSignedDistanceMap(voi);
 	}
 
 	vtkNew<vtkAppendPolyData> append;
@@ -153,7 +169,7 @@ int vtkExtractMidsurface::RequestData(vtkInformation *vtkNotUsed(request),
 		vtkErrorMacro("ExtractMidsurface only works on a volume (dim z > 1).");
 	else
 	{
-		ExtractMidsurface(image, append, dims);
+		ExtractMidsurface(voi, append, voi->GetExtent());
 	}
 
 	output->ShallowCopy(append->GetOutput());
@@ -168,13 +184,56 @@ int vtkExtractMidsurface::RequestData(vtkInformation *vtkNotUsed(request),
 	return 1;
 }
 
-void vtkExtractMidsurface::ExtractMidsurface(vtkImageData *image, vtkAppendPolyData *append, int *dims)
+void vtkExtractMidsurface::FindLabelExtent(int *labelExtent, int *extent, vtkImageData *image)
 {
-	for (int z = 0; z < dims[2]; z++)
+    labelExtent[0] = VTK_INT_MAX;
+    labelExtent[1] = VTK_INT_MIN;
+    labelExtent[2] = VTK_INT_MAX;
+    labelExtent[3] = VTK_INT_MIN;
+    labelExtent[4] = VTK_INT_MAX;
+    labelExtent[5] = VTK_INT_MIN;
+
+    for (int z = extent[4]; z < extent[5]; z++)
+        for (int y = extent[2]; y < extent[3]; y++)
+            for (int x = extent[0]; x < extent[1]; x++)
+            {
+                if (*((double *)(image->GetScalarPointer(x, y, z))) > 0)
+                {
+                    if (x < labelExtent[0])
+                        labelExtent[0] = x;
+                    if (x > labelExtent[1])
+                        labelExtent[1] = x;
+                    if (y < labelExtent[2])
+                        labelExtent[2] = y;
+                    if (y > labelExtent[3])
+                        labelExtent[3] = y;
+                    if (z < labelExtent[4])
+                        labelExtent[4] = z;
+                    if (z > labelExtent[5])
+                        labelExtent[5] = z;
+                }
+            }
+
+    labelExtent[0] = std::max({extent[0], labelExtent[0] - this->LabelExtentBorder});
+    labelExtent[1] = std::min({extent[1], labelExtent[1] + this->LabelExtentBorder});
+    labelExtent[2] = std::max({extent[2], labelExtent[2] - this->LabelExtentBorder});
+    labelExtent[3] = std::min({extent[3], labelExtent[3] + this->LabelExtentBorder});
+    labelExtent[4] = std::max({extent[4], labelExtent[4] - this->LabelExtentBorder});
+    labelExtent[5] = std::min({extent[5], labelExtent[5] + this->LabelExtentBorder});
+
+    vtkLog(INFO, "VOI: [" << labelExtent[0] << ", " << labelExtent[1] << ", "
+                          << labelExtent[2] << ", " << labelExtent[3] << ", "
+                          << labelExtent[4] << ", " << labelExtent[5] << "]");
+}
+
+void vtkExtractMidsurface::ExtractMidsurface(vtkImageData *image, vtkAppendPolyData *append, int *extent)
+{
+	for (int z = extent[4]; z < extent[5]; z++)
 	{
 		vtkNew<vtkExtractVOI> slice;
 		slice->SetInputData(image);
-		slice->SetVOI(0, dims[0] - 1, 0, dims[1] - 1, z, z);
+		// slice->SetVOI(0, dims[0] - 1, 0, dims[1] - 1, z, z);
+		slice->SetVOI(extent[0], extent[1], extent[2], extent[3], z, z);
 		slice->Update();
 
 		vtkNew<vtkExtractCenterLine> centerline;
@@ -199,8 +258,8 @@ void vtkExtractMidsurface::ExtractMidsurface(vtkImageData *image, vtkAppendPolyD
 
 		append->AddInputConnection(centerline->GetOutputPort());
 
-		this->SetProgressText(("Processing slice " + std::to_string(z) + "/" + std::to_string(dims[2])).c_str());
-		this->UpdateProgress(static_cast<double>(z) / static_cast<double>(dims[2]));
+		this->SetProgressText(("Processing slice " + std::to_string(z) + "/" + std::to_string(extent[5] - extent[4])).c_str());
+		this->UpdateProgress(static_cast<double>(z) / static_cast<double>(extent[5] - extent[4]));
 	}
 
 	append->Update();

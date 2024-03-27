@@ -581,6 +581,9 @@
 				</Documentation>
 			</IntVectorProperty>
 
+			<IntVectorProperty name="LabelExtentBorder" command="SetLabelExtentBorder" number_of_elements="1" default_values="3">
+			</IntVectorProperty>
+
 			<IntVectorProperty name="Smoothing" command="SetSmoothing" number_of_elements="1" default_values="1">
 				<BooleanDomain name="bool"/>
 			</IntVectorProperty>
@@ -670,7 +673,7 @@
 				</Documentation>
 			</IntVectorProperty>
 
-<IntVectorProperty name="Connectivity" command="SetConnectivity" number_of_elements="1" default_values="8" panel_visibility="advanced">
+			<IntVectorProperty name="Connectivity" command="SetConnectivity" number_of_elements="1" default_values="8" panel_visibility="advanced">
 				<EnumerationDomain name="enum">
 					<Entry value="4" text="4-connectivity"/>
 					<Entry value="8" text="8-connectivity"/>
@@ -712,7 +715,7 @@
 			</PropertyGroup>
 
 			<PropertyGroup label="Surface settings">
-<Property name="Connectivity" />
+				<Property name="Connectivity" />
 				<Property name="Threshold" />
 				<Property name="Tolerance" />
 				<Property name="ResultType" />
