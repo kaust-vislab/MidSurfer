@@ -68,10 +68,10 @@ void repair_colocate_verticesdd(vtkSmartPointer<vtkPolyData> mesh, double coloca
     mesh->DeepCopy(cleaner->GetOutput());
 }
 //------------------------------------------------
-void repair_colocate_vertices(vtkPolyData* mesh, double colocate_epsilon) {
+vtkPolyData* repair_colocate_vertices(vtkPolyData* mesh, double colocate_epsilon) {
     vtkPoints* points = mesh->GetPoints();
     if (!points) {
-        return;
+        return mesh;
     }
 
     // Initialize a map to store old vertex indices to new vertex indices
@@ -104,7 +104,7 @@ void repair_colocate_vertices(vtkPolyData* mesh, double colocate_epsilon) {
 
     // Check if no colocation occurred
     if (nb_new_vertices == mesh->GetNumberOfPoints()) {
-        return;
+        return mesh;
     }
 
     // Replace vertex indices for cells
@@ -134,6 +134,8 @@ void repair_colocate_vertices(vtkPolyData* mesh, double colocate_epsilon) {
         mesh->DeletePoint(deleteVerts->GetId(i));
     }
     mesh->RemoveDeletedCells();
+
+    return mesh;
 }
 
 
@@ -751,6 +753,7 @@ int vtkZipperTriangulation::RequestData(vtkInformation* vtkNotUsed(request),
         const auto& edges_btm_slice = edges_slice_s[s - slices_begin];
         const auto& edges_up_slice = edges_slice_s[s - slices_begin + 1];
         double min_dist = std::numeric_limits<double>::max();
+        //double max_dist = -1;
 
         for (vtkIdType e : edges_btm_slice) {
             vtkIdType min_dist_edge = -1; // Initialize with -1 indicating no nearest edge found
@@ -771,7 +774,10 @@ int vtkZipperTriangulation::RequestData(vtkInformation* vtkNotUsed(request),
                 slice_avg_width[s]+= min_dist;
                 slice_validpairs_count[s]++;
             }//else it will be a specail case one upper edge has more than one btm edges in nearest --- so we need one triangle instead of 2 
-
+           /* if (min_dist > max_dist)
+            {
+                max_dist = min_dist;
+            }*/
           // logfile <<"\nSlice_"<<s<< " =  e_up["<<e<<"]" << e_up[e] << "\t min_dist" << min_dist;
         }
 
@@ -779,6 +785,7 @@ int vtkZipperTriangulation::RequestData(vtkInformation* vtkNotUsed(request),
         {
             slice_avg_width[s] /= slice_validpairs_count[s];
         }
+        //slice_avg_width[s] = max_dist;
     }
 
     //e_up end --- forward labelling done 
@@ -800,16 +807,14 @@ int vtkZipperTriangulation::RequestData(vtkInformation* vtkNotUsed(request),
             // Check if e1 and e2 form a valid pair
             if (e2 != -1 && e_btm[e2] == e1) {
                 // Create1Quad(output, e1, e2, 2);
-                if (e_upd[e2] < zipper_alfa * slice_avg_width[s])
-                Create2Triangles(mesh, cells, e1, e2, 1);
-
-
+               // if (e_upd[e2] < zipper_alfa * slice_avg_width[s])
+                Create2Triangles(mesh, cells, e1, e2, 1); 
             }
             else {
                 // Handle the case where e1 and e2 do not form a valid pair
-                if (e2 != -1 && e_btm[e2] != -1) {//bottom to up single trinagles filling 
-                    //if(1.2*e_upd[e2]>dist_bw_2es(mesh, e1, e2))
-                    if (zipper_alfa * slice_avg_width[s] > dist_bw_2es(mesh, e1, e2)) 
+                if (e2 != -1 && e_btm[e2] != -1) {//bottom to up single trinagles filling  
+                   // if (zipper_alfa * slice_avg_width[s] > dist_bw_2es(mesh, e1, e2)) 
+                    if (zipper_alfa * e_upd[e2] > dist_bw_2es(mesh, e1, e2))
                     {
                     Create1Triangle(mesh, cells, e1, e2, e_btm[e2], 1);
                     }
@@ -843,10 +848,11 @@ int vtkZipperTriangulation::RequestData(vtkInformation* vtkNotUsed(request),
                     e_upd[e2] = min_dist;
                 }
                 vtkIdType e2adj = e_up[e_btm[e2]];
-                if (e2adj != -1) {
+                if (e2adj != -1 && e_btm[e2adj]!=-1) {
                    // if ( e_upd[e2] < 1.2 * dist_bw_2es(mesh, e2adj, e_btm[e2adj]))
 
-                        if (e_upd[e2] <zipper_alfa * slice_avg_width[s])
+                        //if (e_upd[e2] <zipper_alfa * slice_avg_width[s])
+                    if (e_upd[e2] < zipper_alfa* dist_bw_2es(mesh, e2adj, e_btm[e2adj]))
                         {
                             Create1Triangle(mesh, cells, e2, e_btm[e2], e2adj, 1);
                         }
@@ -859,23 +865,57 @@ int vtkZipperTriangulation::RequestData(vtkInformation* vtkNotUsed(request),
 
         //---------------------------------------------------------------repppp
 
-        logfile << "\nSlice_" << s;
+        //logfile << "\nSlice_" << s;
     }
     //---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- 
         // Close the text file
-    logfile.close();
      
     double colocate_epsilon = 0.1; 
+
+
+    // Repair colocation for the input mesh
+   // vtkSmartPointer<vtkPolyData> mesh2 = vtkSmartPointer<vtkPolyData>::New(); // Create a pointer to vtkPolyData
+   //vtkPolyData* repairedMesh = repair_colocate_vertices(mesh, colocate_epsilon);
+
+   // // Check if the repair operation succeeded
+   // if (repairedMesh != nullptr) {
+   //     // Assign the pointer to repaired mesh to mesh2
+
+   //     logfile << "\n not NULLLLLLLLLLLLL from repair side 1\n";
+   //    mesh2= repairedMesh;
+   // }
+   // else
+   // {
+
+   //     logfile << "\nYes NULLLLLLLLLLLLL from repair side 1\n";
+   // }
+
+
     vtkNew<vtkPolyData> final;
     vtkNew<vtkPoints> points;
+
+    vtkNew<vtkCellArray> cells2;
     for (auto k = 0; k < mesh->GetNumberOfPoints(); k++)
         points->InsertNextPoint(mesh->GetPoint(k));
 
+    //-----------------------------------
+    // 
+   /* for (auto k = 0; k < mesh2->GetNumberOfCells(); k++)
+        cells2->InsertNextCell(mesh2->GetCell(k));*/
     final->SetPoints(points);
     final->SetPolys(cells);
+
+    //logfile << "\nmesh2->GetNumberOfCells() ==" << mesh2->GetNumberOfCells();
+   // logfile << "\nmesh2->GetNumberOfVerts() ==" << mesh2->GetNumberOfVerts();
+    logfile << "\nmesh->GetNumberOfVerts() ==" << mesh->GetNumberOfVerts();
+    logfile << "\nfinal->GetNumberOfVerts() ==" << final->GetNumberOfVerts();
+    //-------------------------------------
+
      
 
-   // repair_colocate_vertices(final, colocate_epsilon);
+
+    logfile.close();
+ 
 
      
     vtkPolyData* output = vtkPolyData::SafeDownCast(outInfo->Get(vtkDataObject::DATA_OBJECT()));
