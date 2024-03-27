@@ -8,7 +8,7 @@
 #include <vtkPoints.h>
 #include <vtkDataArray.h>
 #include <vtkCellArray.h>
-#include <vtkAppendPolyData.h>
+#include <vtkPolyData.h>
 #include <vtkConnectivityFilter.h>
 #include <vtkSmartPointer.h>
 
@@ -119,11 +119,11 @@ private:
 
 	void ComputeGaussianSmoothing(vtkImageData *image);
 	void ComputeSmoothSignedDistanceMap(vtkImageData *image);
-	void ExtractMidsurface(vtkImageData *image, vtkAppendPolyData *append, int *dims);
+	void ExtractMidsurface(vtkImageData *image, vtkPolyData *mesh, int labelId);
     void FindLabelExtent(int *labelExtent, int *extent, vtkImageData *image);
 
-	// std::vector<vtkExtractCenterLine*> centerlines;
-
+	int NumberOfLabels;
+	
 	// GUI parameters
 	char *InputArray;
 	unsigned int SmoothInput;
