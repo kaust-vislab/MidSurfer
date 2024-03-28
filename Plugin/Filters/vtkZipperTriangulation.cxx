@@ -904,6 +904,9 @@ int vtkZipperTriangulation::RequestData(vtkInformation* vtkNotUsed(request),
     final->SetPoints(points);
     final->SetPolys(cells);
 
+    for (int k = 0; k < mesh->GetPointData()->GetNumberOfArrays(); k++)
+        final->GetPointData()->AddArray(mesh->GetPointData()->GetArray(k));
+        
     //logfile << "\nmesh2->GetNumberOfCells() ==" << mesh2->GetNumberOfCells();
    // logfile << "\nmesh2->GetNumberOfVerts() ==" << mesh2->GetNumberOfVerts();
     logfile << "\nmesh->GetNumberOfVerts() ==" << mesh->GetNumberOfVerts();

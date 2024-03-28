@@ -299,7 +299,7 @@ void vtkExtractMidsurface::ExtractMidsurface(vtkImageData *image, vtkPolyData *m
 	{
 		vtkNew<vtkZipperTriangulation> zipper;
 		zipper->SetInputConnection(append->GetOutputPort());
-		zipper->SetZipperAlpha(2.0);
+		zipper->SetZipperAlpha(3.0);
 		zipper->Update();
 		mesh->DeepCopy(zipper->GetOutput());
 	}
