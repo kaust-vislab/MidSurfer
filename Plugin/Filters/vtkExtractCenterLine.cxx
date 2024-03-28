@@ -42,7 +42,7 @@
 
 vtkStandardNewMacro(vtkExtractCenterLine);
 
-namespace MidsurfaceExtractor
+namespace Midsurfacer
 {
 	namespace Tools
 	{
@@ -163,7 +163,7 @@ namespace MidsurfaceExtractor
 
 			centerline->SetPoints(points);
 
-			if ((this->ResultType == RESULT_TYPE_LINE_SET) && (centerline->GetNumberOfPoints() > 1)) // line set
+			if (((this->ResultType == RESULT_TYPE_LINE_SET) || this->ResultType == RESULT_TYPE_TRIANGULATION) && (centerline->GetNumberOfPoints() > 1)) // line set or triangulation
 			{
 				centerline->SetLines(lines);
 			}
@@ -214,7 +214,8 @@ namespace MidsurfaceExtractor
 				*cx += dist;
 				interpMask->Interpolate(p1.data(), &val);
 
-				if (val < 0.5) *cx -= dist; // undo if we stepped out of segmentation mask
+				if (val < 0.5)
+					*cx -= dist; // undo if we stepped out of segmentation mask
 			} while ((val > 0.5) && (f(p1) > fbx));
 
 			Point3 p2 = p;
@@ -226,7 +227,8 @@ namespace MidsurfaceExtractor
 				*ax -= dist;
 				interpMask->Interpolate(p2.data(), &val);
 
-				if (val < 0.5) *ax += dist; // undo if we stepped out of segmentation mask
+				if (val < 0.5)
+					*ax += dist; // undo if we stepped out of segmentation mask
 			} while ((val > 0.5) && (f(p2) > fbx));
 		}
 
@@ -664,7 +666,7 @@ void vtkExtractCenterLine::ExtractCenterlineFromSlice(vtkImageData *slice, vtkAp
 	{
 		vtkMath::Normalize(gradArr->GetTuple3(k));
 	}
-	
+
 	// Compute tensors
 	vtkNew<vtkGradientFilter> tens;
 	tens->SetInputConnection(grad->GetOutputPort());
@@ -672,7 +674,7 @@ void vtkExtractCenterLine::ExtractCenterlineFromSlice(vtkImageData *slice, vtkAp
 	tens->SetResultArrayName("T");
 	tens->Update();
 
-	MidsurfaceExtractor::Tools::CenterlineFromRegionExtractor extract;
+	Midsurfacer::Tools::CenterlineFromRegionExtractor extract;
 
 	for (Point3 p : this->StartPoints)
 	{

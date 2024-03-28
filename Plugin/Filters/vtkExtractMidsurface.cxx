@@ -36,6 +36,7 @@
 #include <vtkSmartPointer.h>
 
 #include "vtkSignedDistanceField.h"
+#include "vtkZipperTriangulation.h"
 
 #include <chrono>
 #include <numbers>
@@ -293,7 +294,16 @@ void vtkExtractMidsurface::ExtractMidsurface(vtkImageData *image, vtkPolyData *m
 	}
 
 	append->GetOutput()->GetPointData()->AddArray(surfaceId);
-	mesh->DeepCopy(append->GetOutput());
+
+	if (this->ResultType == Midsurfacer::Tools::RESULT_TYPE_TRIANGULATION)
+	{
+		vtkNew<vtkZipperTriangulation> zipper;
+		zipper->SetInputConnection(append->GetOutputPort());
+		zipper->Update();
+		mesh->DeepCopy(zipper->GetOutput());
+	}
+	else
+		mesh->DeepCopy(append->GetOutput());
 }
 
 void vtkExtractMidsurface::ComputeSmoothSignedDistanceMap(vtkImageData *image)

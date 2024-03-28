@@ -15,10 +15,17 @@
 typedef std::array<double, 3> Point3;
 typedef std::array<double, 3> Vector3;
 
-namespace MidsurfaceExtractor
+namespace Midsurfacer
 {
 	namespace Tools
 	{
+		enum EResultType
+		{
+			RESULT_TYPE_TRIANGULATION = 1,
+			RESULT_TYPE_LINE_SET = 2,
+			RESULT_TYPE_POINT_SET = 3
+		};
+
 		template <class TReal>
 		TReal **create_matrix(const long nrow, const long ncol);
 		template <class TReal>
@@ -29,12 +36,6 @@ namespace MidsurfaceExtractor
 		public:
 			CenterlineFromRegionExtractor();
 			~CenterlineFromRegionExtractor();
-
-			enum EResultType
-			{
-				RESULT_TYPE_LINE_SET = 1,
-				RESULT_TYPE_POINT_SET = 2
-			};
 
 			void SetInputArray(std::string val) { this->InputArray = val; }
 			void SetGoldenSectionSearch(bool val) { this->GoldenSectionSearch = val; }

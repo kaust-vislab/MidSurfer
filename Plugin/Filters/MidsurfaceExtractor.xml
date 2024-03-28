@@ -665,8 +665,9 @@
 
 			<IntVectorProperty name="ResultType" command="SetResultType" number_of_elements="1" default_values="1">
 				<EnumerationDomain name="enum">
-					<Entry value="1" text="Return result as line set."/>
-					<Entry value="2" text="Return result as point set."/>
+					<Entry value="1" text="Return triangulated result."/>
+					<Entry value="2" text="Return result as line set."/>
+					<Entry value="3" text="Return result as point set."/>
 				</EnumerationDomain>
 				<Documentation>
 					This property indicates which type will be used to return the result.
