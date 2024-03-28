@@ -17,6 +17,9 @@
 				</DataTypeDomain>
 			</InputProperty>
 
+			<DoubleVectorProperty name="ZipperAlpha" command="SetZipperAlpha" number_of_elements="1" default_values="1.1" panel_visibility="advanced">
+			</DoubleVectorProperty>
+
 			<Hints>
 				<ShowInMenu category="Midsurface Extractor" />
 			</Hints>

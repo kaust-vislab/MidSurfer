@@ -12,7 +12,9 @@ class VTKMIDSURFACEEXTRACTOR_EXPORT vtkZipperTriangulation : public vtkPolyDataA
 public:
 	static vtkZipperTriangulation *New();
 	vtkTypeMacro(vtkZipperTriangulation, vtkPolyDataAlgorithm);
-	//vtkTypeMacro(vtkExtractCoreLines, vtkImageAlgorithm);
+
+	vtkSetMacro(ZipperAlpha, double);
+	vtkGetMacro(ZipperAlpha, double);
 
 protected:
 
@@ -26,6 +28,7 @@ private:
 	vtkZipperTriangulation(const vtkZipperTriangulation&) = delete;
 	void operator=(const vtkZipperTriangulation&) = delete;
 
+	double ZipperAlpha;
 };
  
 #endif // __vtkZipperTriangulation_h
