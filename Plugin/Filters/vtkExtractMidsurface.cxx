@@ -210,7 +210,7 @@ void vtkExtractMidsurface::FindLabelExtent(int *labelExtent, int *extent, vtkIma
 		for (int y = extent[2]; y < extent[3]; y++)
 			for (int x = extent[0]; x < extent[1]; x++)
 			{
-				if (*((double *)(image->GetScalarPointer(x - extent[0], y - extent[2], z - extent[4]))) > 0)
+				if (*((double *)(image->GetScalarPointer(x, y, z))) > 0)
 				{
 					if (x < labelExtent[0])
 						labelExtent[0] = x;
@@ -277,8 +277,8 @@ void vtkExtractMidsurface::ExtractMidsurface(vtkImageData *image, vtkPolyData *m
 		append->AddInputConnection(centerline->GetOutputPort());
 
 		this->SetProgressText(("Processing slice " + std::to_string(z - extent[4]) + "/" + std::to_string(extent[5] - extent[4])).c_str());
-		this->UpdateProgress(static_cast<double>(labelId) / static_cast<double>(this->NumberOfLabels) *
-							 static_cast<double>(z - extent[4]) / static_cast<double>(extent[5] - extent[4]));
+		this->UpdateProgress(static_cast<double>(labelId - 1) / static_cast<double>(this->NumberOfLabels) +
+							 static_cast<double>(z - extent[4]) / (static_cast<double>(extent[5] - extent[4]) * static_cast<double>(this->NumberOfLabels)));
 	}
 
 	append->Update();
