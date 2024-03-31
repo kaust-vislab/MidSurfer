@@ -105,6 +105,9 @@ public:
 	vtkSetMacro(LabelExtentBorder, int);
 	vtkGetMacro(LabelExtentBorder, int);
 
+	vtkSetMacro(ZipperAlpha, double);
+	vtkGetMacro(ZipperAlpha, double);
+
 protected:
 	vtkExtractMidsurface();
 	~vtkExtractMidsurface();
@@ -139,6 +142,7 @@ private:
 	bool ShapeDetection;
 	double Tolerance;
 	int LabelExtentBorder;
+	double ZipperAlpha;
 
 	// SDF parameters
 	unsigned int DistanceType; // 1 - 2D, 2 - 3D
