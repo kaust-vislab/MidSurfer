@@ -36,4 +36,4 @@ TODO: links to Nature and morphometrics data sets
 
 ![Method](images/method.png)
 
-TODO: link to papaer web page
+TODO: link to paper web page
