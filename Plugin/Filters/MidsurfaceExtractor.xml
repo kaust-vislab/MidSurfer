@@ -235,47 +235,6 @@
 			<!-- End ConnectedCommponentsBinaryImage -->
 		</SourceProxy>
 
-		<SourceProxy name="ConnectedCommponentsBinaryImage3D" class="vtkConnectedCommponentsBinaryImage3D" label="Compute Connected Commponents in Binary Image 3D">
-			<Documentation long_help="Long help." short_help="Short help.">
-				Description.
-			</Documentation>
-
-			<InputProperty name="Input" command="SetInputConnection">
-				<ProxyGroupDomain name="groups">
-					<Group name="sources"/>
-					<Group name="filters"/>
-				</ProxyGroupDomain>
-				<DataTypeDomain name="input_type">
-					<DataType value="vtkImageData"/>
-				</DataTypeDomain>
-			</InputProperty>
-
-			<StringVectorProperty name="InputArray" label="Input mask" command="SetInputArray" element_types="2" number_of_elements="1">
-				<ArrayListDomain name="array_list" attribute_type="Scalars" input_domain_name="inputs_array">
-					<RequiredProperties>
-						<Property name="Input" function="Input" />
-					</RequiredProperties>
-				</ArrayListDomain>
-			</StringVectorProperty>
-
-			<IntVectorProperty name="Connectivity" command="SetConnectivity" number_of_elements="1" default_values="26">
-				<EnumerationDomain name="enum">
-					<Entry value="6" text="6-connectivity"/>
-					<Entry value="18" text="18-connectivity"/>
-					<Entry value="26" text="26-connectivity"/>
-				</EnumerationDomain>
-				<Documentation>
-					This property indicates what type of metric we use to calculate the distance field.
-				</Documentation>
-			</IntVectorProperty>
-
-			<Hints>
-				<ShowInMenu category="Midsurface Extractor" />
-			</Hints>
-
-			<!-- End ConnectedCommponentsBinaryImage3D -->
-		</SourceProxy>
-
 		<SourceProxy name="ExtractCenterLine" class="vtkExtractCenterLine" label="Extract Center Line">
 			<Documentation long_help="Long help." short_help="Short help.">
 				Description.
@@ -727,41 +686,6 @@
 				<Property name="ResultType" />
 			</PropertyGroup>
 
-			<Hints>
-				<ShowInMenu category="Midsurface Extractor" />
-			</Hints>
-
-			<!-- End ComputeEigenVectorField -->
-		</SourceProxy>
-
-
-		<SourceProxy name="ExtractMidsurface3D" class="vtkExtractMidsurface3D" label="Extract Midsurface 3D">
-			<Documentation long_help="Long help." short_help="Short help.">
-				Description.
-			</Documentation>
-			<InputProperty name="Input" command="SetInputConnection">
-				<ProxyGroupDomain name="groups">
-					<Group name="sources"/>
-					<Group name="filters"/>
-				</ProxyGroupDomain>
-				<DataTypeDomain name="input_type">
-					<DataType value="vtkImageData"/>
-				</DataTypeDomain>
-			</InputProperty>
-
-			<StringVectorProperty name="InputArray" label="Input Array" command="SetInputArray" element_types="2" number_of_elements="1">
-				<ArrayListDomain name="array_list" attribute_type="Scalars" input_domain_name="inputs_array">
-					<RequiredProperties>
-						<Property name="Input" function="Input" />
-					</RequiredProperties>
-				</ArrayListDomain>
-			</StringVectorProperty>
-			<DoubleVectorProperty name="IntegrationStep" command="SetIntegrationStep" number_of_elements="1" default_values="0.5">
-			</DoubleVectorProperty>
-			<DoubleVectorProperty name="RadiusFactors" command="SetRadiusFactors" number_of_elements="3" default_values="4.0 4.0 4.0">
-			</DoubleVectorProperty>
-			<DoubleVectorProperty name="StandardDeviations" command="SetStandardDeviations" number_of_elements="3" default_values="5.0 5.0 5.0">
-			</DoubleVectorProperty>
 			<Hints>
 				<ShowInMenu category="Midsurface Extractor" />
 			</Hints>

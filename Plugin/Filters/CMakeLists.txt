@@ -3,11 +3,9 @@ set(classes
   vtkExtractCenterLine
   vtkExtractCenterLineFromRegion
   vtkExtractMidsurface
-  vtkExtractMidsurface3D
   vtkGeneratePointCloudFromSegmentationMask
   vtkSignedDistanceField
   vtkConnectedCommponentsBinaryImage
-  vtkConnectedCommponentsBinaryImage3D
   vtkZipperTriangulation
 )
 
