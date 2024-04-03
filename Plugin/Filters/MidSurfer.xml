@@ -461,7 +461,7 @@
 				<BooleanDomain name="bool"/>
 			</IntVectorProperty>
 
-			<IntVectorProperty name="SmoothInput" command="SetSmoothInput" number_of_elements="1" default_values="6">
+			<IntVectorProperty name="SmoothInput" command="SetSmoothInput" number_of_elements="1" default_values="6" panel_visibility="advanced">
 				<EnumerationDomain name="enum">
 					<Entry value="1" text="No smoothing"/>
 					<Entry value="2" text="Gaussian smoothing 2D"/>
@@ -515,7 +515,7 @@
 				</Hints>
 			</DoubleVectorProperty>
 
-			<IntVectorProperty name="FieldType" command="SetFieldType" number_of_elements="1" default_values="1">
+			<IntVectorProperty name="FieldType" command="SetFieldType" number_of_elements="1" default_values="1" panel_visibility="advanced">
 				<EnumerationDomain name="enum">
 					<Entry value="1" text="Inside"/>
 					<Entry value="2" text="Outside"/>
@@ -533,7 +533,7 @@
 				</Hints>
 			</IntVectorProperty>
 
-			<IntVectorProperty name="DistanceType" command="SetDistanceType" number_of_elements="1" default_values="2">
+			<IntVectorProperty name="DistanceType" command="SetDistanceType" number_of_elements="1" default_values="2" panel_visibility="advanced">
 				<EnumerationDomain name="enum">
 					<Entry value="1" text="2D"/>
 					<Entry value="2" text="3D"/>
@@ -543,14 +543,14 @@
 				</Documentation>
 			</IntVectorProperty>
 
-			<IntVectorProperty name="LabelExtentBorder" command="SetLabelExtentBorder" number_of_elements="1" default_values="3">
+			<IntVectorProperty name="LabelExtentBorder" command="SetLabelExtentBorder" number_of_elements="1" default_values="3" panel_visibility="advanced">
 			</IntVectorProperty>
 
-			<IntVectorProperty name="Smoothing" command="SetSmoothing" number_of_elements="1" default_values="1">
+			<IntVectorProperty name="Smoothing" command="SetSmoothing" number_of_elements="1" default_values="1" panel_visibility="advanced">
 				<BooleanDomain name="bool"/>
 			</IntVectorProperty>
 
-			<IntVectorProperty name="ManualSmoothing" command="SetManualSmoothing" number_of_elements="1" default_values="0">
+			<IntVectorProperty name="ManualSmoothing" command="SetManualSmoothing" number_of_elements="1" default_values="0" panel_visibility="advanced">
 				<BooleanDomain name="bool"/>
 				<Hints>
 					<PropertyWidgetDecorator type="GenericDecorator"
@@ -561,7 +561,7 @@
 				</Hints>
 			</IntVectorProperty>
 
-			<DoubleVectorProperty name="SDFRadiusFactors" command="SetSDFRadiusFactors" number_of_elements="3" default_values="4.0 4.0 4.0">
+			<DoubleVectorProperty name="SDFRadiusFactors" command="SetSDFRadiusFactors" number_of_elements="3" default_values="4.0 4.0 4.0" panel_visibility="advanced">
 				<Hints>
 					<PropertyWidgetDecorator type="GenericDecorator"
 											 mode="visibility"
@@ -571,7 +571,7 @@
 				</Hints>
 			</DoubleVectorProperty>
 
-			<DoubleVectorProperty name="SDFStandardDeviations" command="SetSDFStandardDeviations" number_of_elements="3" default_values="5.0 5.0 5.0">
+			<DoubleVectorProperty name="SDFStandardDeviations" command="SetSDFStandardDeviations" number_of_elements="3" default_values="5.0 5.0 5.0" panel_visibility="advanced">
 				<Hints>
 					<PropertyWidgetDecorator type="GenericDecorator"
 											 mode="visibility"
@@ -581,7 +581,7 @@
 				</Hints>
 			</DoubleVectorProperty>
 
-			<DoubleVectorProperty name="SigmaDivisor" command="SetSigmaDivisor" number_of_elements="1" default_values="3.0">
+			<DoubleVectorProperty name="SigmaDivisor" command="SetSigmaDivisor" number_of_elements="1" default_values="3.0" panel_visibility="advanced">
 				<Hints>
 					<PropertyWidgetDecorator type="GenericDecorator"
 											 mode="visibility"
@@ -595,7 +595,7 @@
 				</Hints>
 			</DoubleVectorProperty>
 
-			<DoubleVectorProperty name="TestingRadius" command="SetTestingRadius" number_of_elements="1" default_values="1.0">
+			<DoubleVectorProperty name="TestingRadius" command="SetTestingRadius" number_of_elements="1" default_values="1.0" panel_visibility="advanced">
 				<Hints>
 					<PropertyWidgetDecorator type="GenericDecorator"
 											 mode="visibility"
@@ -609,7 +609,7 @@
 				</Hints>
 			</DoubleVectorProperty>
 
-			<IntVectorProperty name="Normalize" command="SetNormalize" number_of_elements="1" default_values="0">
+			<IntVectorProperty name="Normalize" command="SetNormalize" number_of_elements="1" default_values="0" panel_visibility="advanced">
 				<BooleanDomain name="bool"/>
 				<Hints>
 					<PropertyWidgetDecorator type="GenericDecorator"
@@ -625,7 +625,7 @@
 			<DoubleVectorProperty name="Tolerance" command="SetTolerance" number_of_elements="1" default_values="0.1" panel_visibility="advanced">
 			</DoubleVectorProperty>
 
-			<IntVectorProperty name="ResultType" command="SetResultType" number_of_elements="1" default_values="1">
+			<IntVectorProperty name="ResultType" command="SetResultType" number_of_elements="1" default_values="1" panel_visibility="advanced">
 				<EnumerationDomain name="enum">
 					<Entry value="1" text="Return triangulated result."/>
 					<Entry value="2" text="Return result as line set."/>
@@ -646,7 +646,7 @@
 				</Documentation>
 			</IntVectorProperty>
 
-			<DoubleVectorProperty name="ZipperAlpha" command="SetZipperAlpha" number_of_elements="1" default_values="1.1" panel_visibility="advanced">
+			<DoubleVectorProperty name="ZipperAlpha" command="SetZipperAlpha" number_of_elements="1" default_values="2.0" panel_visibility="advanced">
 			</DoubleVectorProperty>
 
 			<PropertyGroup label="General settings">
