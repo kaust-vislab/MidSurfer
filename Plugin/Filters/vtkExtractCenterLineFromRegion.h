@@ -1,7 +1,7 @@
 #ifndef __vtkExtractCenterLineFromRegion_h
 #define __vtkExtractCenterLineFromRegion_h
 
-#include "vtkMidsurfaceExtractorModule.h" // for export
+#include "vtkMidSurferModule.h" // for export
 #include <vtkPVLogger.h>
 
 #include "vtkImageAlgorithm.h"
@@ -16,7 +16,7 @@
 typedef std::array<double, 3> Point3;
 typedef std::array<double, 3> Vector3;
 
-class VTKMIDSURFACEEXTRACTOR_EXPORT vtkExtractCenterLineFromRegion : public vtkImageAlgorithm
+class VTKMIDSURFER_EXPORT vtkExtractCenterLineFromRegion : public vtkImageAlgorithm
 {
 public:
 	enum ESmoothingMethod

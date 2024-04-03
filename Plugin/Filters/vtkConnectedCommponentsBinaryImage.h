@@ -1,12 +1,12 @@
 #ifndef __vtkConnectedCommponentsBinaryImage_h
 #define __vtkConnectedCommponentsBinaryImage_h
 
-#include "vtkMidsurfaceExtractorModule.h" // for export
+#include "vtkMidSurferModule.h" // for export
 #include <vtkImageData.h>
 
 #include "vtkImageAlgorithm.h"
 
-class VTKMIDSURFACEEXTRACTOR_EXPORT vtkConnectedCommponentsBinaryImage : public vtkImageAlgorithm
+class VTKMIDSURFER_EXPORT vtkConnectedCommponentsBinaryImage : public vtkImageAlgorithm
 {
 public:
 	static vtkConnectedCommponentsBinaryImage *New();

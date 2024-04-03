@@ -1,7 +1,7 @@
 #ifndef __vtkGeneratePointCloudFromSegmentationMask_h
 #define __vtkGeneratePointCloudFromSegmentationMask_h
 
-#include "vtkMidsurfaceExtractorModule.h" // for export
+#include "vtkMidSurferModule.h" // for export
 #include <vtkPVLogger.h>
 
 #include "vtkImageAlgorithm.h"
@@ -11,7 +11,7 @@
 #include <vtkAppendPolyData.h>
 #include <vtkConnectivityFilter.h>
 
-class VTKMIDSURFACEEXTRACTOR_EXPORT vtkGeneratePointCloudFromSegmentationMask : public vtkImageAlgorithm
+class VTKMIDSURFER_EXPORT vtkGeneratePointCloudFromSegmentationMask : public vtkImageAlgorithm
 {
 public:
 	static vtkGeneratePointCloudFromSegmentationMask *New();

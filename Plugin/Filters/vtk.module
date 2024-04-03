@@ -1,7 +1,7 @@
 NAME
-  MidsurfaceExtractor::vtkMidsurfaceExtractor
+  MidSurfer::vtkMidSurfer
 LIBRARY_NAME
-  vtkMidsurfaceExtractor
+  vtkMidSurfer
 DEPENDS
   ParaView::VTKExtensionsCore
   VTK::FiltersCore

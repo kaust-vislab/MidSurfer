@@ -1,7 +1,7 @@
 #ifndef __vtkComputeEigenVectorField_h
 #define __vtkComputeEigenVectorField_h
 
-#include "vtkMidsurfaceExtractorModule.h" // for export
+#include "vtkMidSurferModule.h" // for export
 #include <vtkPVLogger.h>
 #include <vtkImageData.h>
 #include <vtkGradientFilter.h>
@@ -9,7 +9,7 @@
 
 #include "vtkImageAlgorithm.h"
 
-class VTKMIDSURFACEEXTRACTOR_EXPORT vtkComputeEigenVectorField : public vtkImageAlgorithm
+class VTKMIDSURFER_EXPORT vtkComputeEigenVectorField : public vtkImageAlgorithm
 {
 public:
 	enum ESmoothInput

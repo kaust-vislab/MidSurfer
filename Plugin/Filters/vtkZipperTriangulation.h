@@ -1,12 +1,12 @@
 #ifndef __vtkZipperTriangulation_h
 #define __vtkZipperTriangulation_h
  
-#include "vtkMidsurfaceExtractorModule.h" // for export
+#include "vtkMidSurferModule.h" // for export
 #include <vtkPVLogger.h>
 
 #include "vtkPolyDataAlgorithm.h"
  
-class VTKMIDSURFACEEXTRACTOR_EXPORT vtkZipperTriangulation : public vtkPolyDataAlgorithm
+class VTKMIDSURFER_EXPORT vtkZipperTriangulation : public vtkPolyDataAlgorithm
 //class STTKPLUGIN_EXPORT vtkExtractCoreLines : public vtkImageAlgorithm
 {
 public:

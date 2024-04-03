@@ -5,7 +5,7 @@
 #ifndef __vtkSignedDistanceField_h
 #define __vtkSignedDistanceField_h
 
-#include "vtkMidsurfaceExtractorModule.h" // for export
+#include "vtkMidSurferModule.h" // for export
 
 #include <vtkBitArray.h>
 #include <vtkDataArrayMeta.h>
@@ -16,7 +16,7 @@
 #include <vtkSetGet.h>
 #include <vtkImageAppend.h>
 
-class VTKMIDSURFACEEXTRACTOR_EXPORT vtkSignedDistanceField
+class VTKMIDSURFER_EXPORT vtkSignedDistanceField
 	: public vtkImageAlgorithm {
 public:
 	enum EDistanceType {

@@ -1,7 +1,7 @@
 #ifndef __vtkExtractCenterLine_h
 #define __vtkExtractCenterLine_h
 
-#include "vtkMidsurfaceExtractorModule.h" // for export
+#include "vtkMidSurferModule.h" // for export
 #include <vtkPVLogger.h>
 
 #include "vtkImageAlgorithm.h"
@@ -79,7 +79,7 @@ namespace Midsurfacer
 	}
 }
 
-class VTKMIDSURFACEEXTRACTOR_EXPORT vtkExtractCenterLine : public vtkImageAlgorithm
+class VTKMIDSURFER_EXPORT vtkExtractCenterLine : public vtkImageAlgorithm
 {
 public:
 	/// @brief Matches vtkExtractMidsurface::SmoothInput, but Gaussian 3D is not applicable

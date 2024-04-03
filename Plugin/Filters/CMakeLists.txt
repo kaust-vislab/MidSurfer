@@ -9,11 +9,7 @@ set(classes
   vtkZipperTriangulation
 )
 
-set(sources
-  #signed_distance.cxx
-)
-
-vtk_module_add_module(MidsurfaceExtractor::vtkMidsurfaceExtractor
+vtk_module_add_module(MidSurfer::vtkMidSurfer
   FORCE_STATIC
   CLASSES ${classes}
   SOURCES ${sources}
