@@ -21,7 +21,7 @@
 			</DoubleVectorProperty>
 
 			<Hints>
-				<ShowInMenu category="Midsurface Extractor" />
+				<ShowInMenu category="MidSurfer" />
 			</Hints>
 
 			<!-- End ZipperTriangulation -->
@@ -55,7 +55,7 @@
 			</IntVectorProperty>
 
 			<Hints>
-				<ShowInMenu category="Midsurface Extractor" />
+				<ShowInMenu category="MidSurfer" />
 			</Hints>
 
 			<!-- End GeneratePointCloudFromSegmentationMask -->
@@ -189,7 +189,7 @@
 			</DoubleVectorProperty>
 
 			<Hints>
-				<ShowInMenu category="Midsurface Extractor" />
+				<ShowInMenu category="MidSurfer" />
 			</Hints>
 
 			<!-- End ComputeEigenVectorField -->
@@ -229,7 +229,7 @@
 			</IntVectorProperty>
 
 			<Hints>
-				<ShowInMenu category="Midsurface Extractor" />
+				<ShowInMenu category="MidSurfer" />
 			</Hints>
 
 			<!-- End ConnectedCommponentsBinaryImage -->
@@ -411,7 +411,7 @@
 			</IntVectorProperty>
 
 			<Hints>
-				<ShowInMenu category="Midsurface Extractor" />
+				<ShowInMenu category="MidSurfer" />
 			</Hints>
 
 			<!-- End ComputeEigenVectorField -->
@@ -687,7 +687,7 @@
 			</PropertyGroup>
 
 			<Hints>
-				<ShowInMenu category="Midsurface Extractor" />
+				<ShowInMenu category="MidSurfer" />
 			</Hints>
 
 			<!-- End ComputeEigenVectorField -->
@@ -816,7 +816,7 @@
 			</IntVectorProperty>
 
 			<Hints>
-				<ShowInMenu category="Midsurface Extractor" />
+				<ShowInMenu category="MidSurfer" />
 			</Hints>
 
 			<!-- End ImageEuclideanSignedDistance -->

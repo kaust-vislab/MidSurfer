@@ -21,4 +21,4 @@ vtk_module_add_module(MidsurfaceExtractor::vtkMidsurfaceExtractor
 )
 
 paraview_add_server_manager_xmls(
-  XMLS  MidsurfaceExtractor.xml)
+  XMLS  MidSurfer.xml)
