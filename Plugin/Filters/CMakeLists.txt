@@ -1,7 +1,6 @@
 set(classes
   vtkComputeEigenVectorField
   vtkExtractCenterLine
-  vtkExtractCenterLineFromRegion
   vtkExtractMidsurface
   vtkGeneratePointCloudFromSegmentationMask
   vtkSignedDistanceField
