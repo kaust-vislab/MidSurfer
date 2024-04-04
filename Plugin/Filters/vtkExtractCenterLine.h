@@ -25,6 +25,8 @@ namespace Midsurfacer
 			RESULT_TYPE_LINE_SET = 2,
 			RESULT_TYPE_POINT_SET = 3
 		};
+		
+		enum EMorphological { DILATION = 1, CLOSING = 2, NONE = 3 };
 
 		template <class TReal>
 		TReal **create_matrix(const long nrow, const long ncol);
@@ -42,8 +44,11 @@ namespace Midsurfacer
 			void SetResultType(int val) { this->ResultType = val; }
 			void SetIntegrationStep(double val) { this->IntegrationStep = val; }
 			void SetTolerance(double val) { this->Tolerance = val; }
+			void SetMorphological(unsigned int val) { this->Morphological = val; }
 
 			void ExtractCenterlineFromRegion(const Point3 &arr, vtkImageData *input, vtkPolyData *centerline);
+			bool ExtractCenterlineFromRegionPlus(const Point3 &arr, vtkImageData *input, vtkPolyData *centerline, int regionID, std::unordered_map<int, std::vector<int>> *remainingPixels);
+			Point3 CheckIfLineMissingPlus(vtkImageData *slice, vtkCellArray *lines, int regionID, std::unordered_map<int, std::vector<int>> *remainingPixels);
 
 		private:
 			CenterlineFromRegionExtractor(const CenterlineFromRegionExtractor &copy_from) = delete;
@@ -61,6 +66,10 @@ namespace Midsurfacer
 			double GetSmoothedValue(Point3 &p);
 			double GetSmoothedValueAlongLine(Point3 &p, Vector3 &v, double x);
 
+			int AppendPointsPlus(Point3 &p, int k, vtkImageData *input, vtkPoints *points, vtkCellArray *lines, int regionID, int maxValue, std::unordered_map<int, std::vector<int>> *remainingPixels, vtkPolyData *centerline, std::vector<int> *pixelsToRemove);
+			void SetPointAsVisitedPlus(vtkImageData *slice, Point3 p, int neighborhoodSize, int regionID, std::unordered_map<int, std::vector<int>> *remainingPixels, std::vector<int> *pixelsToRemove);
+			void RemoveVisitedPixelsPlus(vtkImageData *slice, std::vector<int> *pixelsToRemove);
+			
 			std::string InputArray;
 			vtkDataArray *heightArr;
 			vtkDataArray *smoothHeightArr;
@@ -75,6 +84,7 @@ namespace Midsurfacer
 			int ResultType;
 			double IntegrationStep;
 			double Tolerance;
+			unsigned int Morphological;
 		};
 	}
 }
@@ -91,6 +101,8 @@ public:
 		SMOOTH_INPUT_SIGNED_DISTANCE_FIELD = 5,
 	};
 
+	enum EMorphological { DILATION = 1, CLOSING = 2, NONE = 3 };
+	
 	static vtkExtractCenterLine *New();
 	vtkTypeMacro(vtkExtractCenterLine, vtkImageAlgorithm);
 
@@ -148,6 +160,12 @@ public:
 	vtkSetMacro(Connectivity, unsigned int);
 	vtkGetMacro(Connectivity, unsigned int);
 
+	vtkSetMacro(Morphological, unsigned int);
+	vtkGetMacro(Morphological, unsigned int);
+	
+	vtkSetMacro(Advanced, bool);
+	vtkGetMacro(Advanced, bool);
+
 protected:
 	vtkExtractCenterLine();
 	~vtkExtractCenterLine();
@@ -163,6 +181,8 @@ private:
 	void ExtractCenterlineFromSlice(vtkImageData *input, vtkAppendPolyData *append);
 	bool IsDiskShaped(vtkImageData *slice, int regionID);
 	int SelectStartingPoints(vtkImageData *slice);
+
+	std::unordered_map<int, Point3> SelectStartingPointsPlus(vtkImageData *slice);
 
 	std::vector<Point3> StartPoints;
 
@@ -185,6 +205,8 @@ private:
 	bool ShapeDetection;
 	double Tolerance;
 	unsigned int Connectivity;
+	unsigned int Morphological; // 1 - Dilation, 2 - Closing
+	bool Advanced;
 };
 
 #endif // __vtkExtractCenterLine_h

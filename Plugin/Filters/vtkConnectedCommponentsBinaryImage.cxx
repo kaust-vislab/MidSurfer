@@ -68,7 +68,7 @@ void vtkConnectedCommponentsBinaryImage::AddRegionIDs(vtkImageData *output)
 
 	std::vector<std::vector<int>> w;
 	w.resize(dims[0] + 2, std::vector<int>(dims[1] + 2, 0)); // add zero boundary
-	
+
 	int set = 1;
 
 	for (int i = 1; i <= dims[0]; i++)
@@ -77,7 +77,7 @@ void vtkConnectedCommponentsBinaryImage::AddRegionIDs(vtkImageData *output)
 				dfs(i, j, set++, g, w);
 
 	this->NumberOfConnectedRegions = set - 1;
-	
+
 	vtkNew<vtkIntArray> cc;
 	cc->SetName("RegionID");
 	cc->SetNumberOfComponents(1);
@@ -103,5 +103,110 @@ void vtkConnectedCommponentsBinaryImage::dfs(int x, int y, int c, std::vector<st
 		int nx = x + dx[i], ny = y + dy[i];
 		if ((g[nx][ny] > 0) && (w[nx][ny] == 0))
 			dfs(nx, ny, c, g, w);
+	}
+}
+
+void vtkConnectedCommponentsBinaryImage::DilateConnectedComponents(vtkImageData *slice, vtkIntArray *dilatedMaskArr)
+{
+	auto mask = slice->GetPointData()->GetArray("RegionID");
+	vtkLog(INFO, "Dilating the mask.");
+	auto size = mask->GetNumberOfTuples();
+	auto width = slice->GetDimensions()[0];
+	auto height = slice->GetDimensions()[1];
+	for (int i = 0; i < size; i++)
+	{
+		bool found = false;
+		int reg = 0;
+		auto pixel = mask->GetTuple1(i);
+		if (pixel == 0)
+		{
+			int x = i % width;
+			int y = i / width;
+			for (int j = -1; j <= 1; j++)
+			{
+				for (int k = -1; k <= 1; k++)
+				{
+					int nx = x + k;
+					int ny = y + j;
+					if (nx >= 0 && nx < width && ny >= 0 && ny < height)
+					{
+						int idx = ny * width + nx;
+						auto val = mask->GetTuple1(idx);
+						if (val > 0)
+						{
+							found = true;
+							reg = val;
+						}
+					}
+				}
+			}
+			if (found)
+			{
+				dilatedMaskArr->SetTuple1(i, reg);
+			}
+			else
+			{
+				dilatedMaskArr->SetTuple1(i, 0);
+			}
+		}
+		else
+		{
+			dilatedMaskArr->SetTuple1(i, pixel);
+		}
+	}
+}
+
+void vtkConnectedCommponentsBinaryImage::CloseConnectedComponents(vtkImageData *slice, vtkIntArray *closedMaskArr)
+{
+	auto mask = slice->GetPointData()->GetArray("dilatedMask");
+	vtkLog(INFO, "Closing the mask.");
+	auto size = mask->GetNumberOfTuples();
+	auto width = slice->GetDimensions()[0];
+	auto height = slice->GetDimensions()[1];
+	for (int i = 0; i < size; i++)
+	{
+		auto pixel = mask->GetTuple1(i);
+
+		if (pixel > 0)
+		{ // Only process non-zero pixels for erosion
+			int x = i % width;
+			int y = i / width;
+			bool edgePixel = false;
+			for (int j = -1; j <= 1; j++)
+			{
+				for (int k = -1; k <= 1; k++)
+				{
+					int nx = x + k;
+					int ny = y + j;
+					if (nx >= 0 && nx < width && ny >= 0 && ny < height)
+					{
+						int idx = ny * width + nx;
+						auto val = mask->GetTuple1(idx);
+						if (val == 0)
+						{
+							edgePixel = true;
+							break;
+						}
+					}
+				}
+				if (edgePixel)
+				{
+					break;
+				}
+			}
+			if (edgePixel)
+			{
+				// Erode pixel by setting its value to zero
+				closedMaskArr->SetTuple1(i, 0);
+			}
+			else
+			{
+				closedMaskArr->SetTuple1(i, pixel);
+			}
+		}
+		else
+		{
+			closedMaskArr->SetTuple1(i, pixel);
+		}
 	}
 }

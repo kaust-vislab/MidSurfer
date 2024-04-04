@@ -225,19 +225,15 @@ void vtkSignedDistanceField::ComputeSignedDistanceField(vtkDoubleArray* dist, vt
 
 	if (this->FieldType == INSIDE || this->FieldType == BOTH)
 	{
-		vtkLog(INFO, "debug");
 		auto dist_inside = vtkSmartPointer<vtkImageEuclideanDistance>::New();
 		dist_inside->SetInputData(originalImage);
 		dist_inside->SetDimensionality(this->DistanceType == _2D ? 2 : 3);
 		dist_inside->SetAlgorithmToSaito();
 		dist_inside->Update();
-		vtkLog(INFO, "debug");
 
 		root_inside->SetInput1Data(dist_inside->GetOutput());
 		root_inside->SetOperationToSquareRoot();
 		root_inside->Update();
-		vtkLog(INFO, "debug");
-
 	}
 
 	if (this->FieldType == OUTSIDE || this->FieldType == BOTH)

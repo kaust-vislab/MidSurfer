@@ -1,14 +1,14 @@
-#ifndef __vtkExtractMidsurface_h
-#define __vtkExtractMidsurface_h
+#ifndef __vtkExtractMidsurfacePlus_h
+#define __vtkExtractMidsurfacePlus_h
 
-#include "vtkMidSurferModule.h" // for export
+#include "vtkMidsurfaceExtractorModule.h" // for export
 #include <vtkPVLogger.h>
 
 #include "vtkImageAlgorithm.h"
 #include <vtkPoints.h>
 #include <vtkDataArray.h>
 #include <vtkCellArray.h>
-#include <vtkPolyData.h>
+#include <vtkAppendPolyData.h>
 #include <vtkConnectivityFilter.h>
 #include <vtkSmartPointer.h>
 
@@ -17,7 +17,7 @@
 typedef std::array<double, 3> Point3;
 typedef std::array<double, 3> Vector3;
 
-class VTKMIDSURFER_EXPORT vtkExtractMidsurface : public vtkImageAlgorithm
+class VTKMIDSURFACEEXTRACTOR_EXPORT vtkExtractMidsurfacePlus : public vtkImageAlgorithm
 {
 public:
 	enum ESmoothingMethod
@@ -32,8 +32,8 @@ public:
 
 	enum EMorphological { DILATION = 1, CLOSING = 2, NONE = 3 };
 
-	static vtkExtractMidsurface *New();
-	vtkTypeMacro(vtkExtractMidsurface, vtkImageAlgorithm);
+	static vtkExtractMidsurfacePlus *New();
+	vtkTypeMacro(vtkExtractMidsurfacePlus, vtkImageAlgorithm);
 
 	vtkGetStringMacro(InputArray);
 	vtkSetStringMacro(InputArray);
@@ -104,31 +104,27 @@ public:
 	vtkSetMacro(Connectivity, unsigned int);
 	vtkGetMacro(Connectivity, unsigned int);
 
-	vtkSetMacro(LabelExtentBorder, int);
-	vtkGetMacro(LabelExtentBorder, int);
-
-	vtkSetMacro(ZipperAlpha, double);
-	vtkGetMacro(ZipperAlpha, double);
+	vtkSetMacro(Morphological, unsigned int);
+	vtkGetMacro(Morphological, unsigned int);
 
 protected:
-	vtkExtractMidsurface();
-	~vtkExtractMidsurface();
+	vtkExtractMidsurfacePlus();
+	~vtkExtractMidsurfacePlus();
 
-    int RequestData(vtkInformation *, vtkInformationVector **, vtkInformationVector *) override;
-    int RequestInformation(vtkInformation *vtkNotUsed(request), vtkInformationVector **inputVector, vtkInformationVector *outputVector) override;
-    int FillOutputPortInformation(int, vtkInformation *) override;
+	int RequestData(vtkInformation *, vtkInformationVector **, vtkInformationVector *) override;
+	int RequestInformation(vtkInformation *vtkNotUsed(request), vtkInformationVector **inputVector, vtkInformationVector *outputVector) override;
+	int FillOutputPortInformation(int, vtkInformation *) override;
 
 private:
-	vtkExtractMidsurface(const vtkExtractMidsurface &) = delete;
-	void operator=(const vtkExtractMidsurface &) = delete;
+	vtkExtractMidsurfacePlus(const vtkExtractMidsurfacePlus &) = delete;
+	void operator=(const vtkExtractMidsurfacePlus &) = delete;
 
 	void ComputeGaussianSmoothing(vtkImageData *image);
 	void ComputeSmoothSignedDistanceMap(vtkImageData *image);
-	void ExtractMidsurface(vtkImageData *image, vtkPolyData *mesh, int labelId);
-    void FindLabelExtent(int *labelExtent, int *extent, vtkImageData *image);
+	void ExtractMidsurface(vtkImageData *image, vtkAppendPolyData *append, int *dims);
 
-	int NumberOfLabels;
-	
+	// std::vector<vtkExtractCenterLine*> centerlines;
+
 	// GUI parameters
 	char *InputArray;
 	unsigned int SmoothInput;
@@ -143,8 +139,6 @@ private:
 	bool GoldenSectionSearch;
 	bool ShapeDetection;
 	double Tolerance;
-	int LabelExtentBorder;
-	double ZipperAlpha;
 
 	// SDF parameters
 	unsigned int DistanceType; // 1 - 2D, 2 - 3D
@@ -157,6 +151,7 @@ private:
 	double TestingRadius;
 	bool Normalize;
 	unsigned int Connectivity;
+	unsigned int Morphological;
 };
 
-#endif // __vtkExtractMidsurface_h
+#endif // __vtkExtractMidsurfacePlus_h

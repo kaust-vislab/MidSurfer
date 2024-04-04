@@ -6,6 +6,7 @@ set(classes
   vtkSignedDistanceField
   vtkConnectedCommponentsBinaryImage
   vtkZipperTriangulation
+  vtkExtractMidsurfacePlus
 )
 
 vtk_module_add_module(MidSurfer::vtkMidSurfer

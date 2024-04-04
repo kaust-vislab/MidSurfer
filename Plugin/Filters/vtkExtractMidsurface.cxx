@@ -241,6 +241,8 @@ void vtkExtractMidsurface::FindLabelExtent(int *labelExtent, int *extent, vtkIma
 
 void vtkExtractMidsurface::ExtractMidsurface(vtkImageData *image, vtkPolyData *mesh, int labelId)
 {
+	vtkLog(INFO, "Extracting midsurface.");
+
 	int extent[6];
 	image->GetExtent(extent);
 
@@ -272,6 +274,8 @@ void vtkExtractMidsurface::ExtractMidsurface(vtkImageData *image, vtkPolyData *m
 		centerline->SetThreshold(this->Threshold);
 		centerline->SetTolerance(this->Tolerance);
 		centerline->SetConnectivity(this->Connectivity);
+		centerline->SetMorphological(EMorphological::NONE);
+		centerline->SetAdvanced(false);
 		centerline->Update();
 
 		append->AddInputConnection(centerline->GetOutputPort());
