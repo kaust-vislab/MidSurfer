@@ -1,7 +1,7 @@
 #ifndef __vtkExtractMidsurfacePlus_h
 #define __vtkExtractMidsurfacePlus_h
 
-#include "vtkMidsurfaceExtractorModule.h" // for export
+#include "vtkMidSurferModule.h" // for export
 #include <vtkPVLogger.h>
 
 #include "vtkImageAlgorithm.h"
@@ -17,7 +17,7 @@
 typedef std::array<double, 3> Point3;
 typedef std::array<double, 3> Vector3;
 
-class VTKMIDSURFACEEXTRACTOR_EXPORT vtkExtractMidsurfacePlus : public vtkImageAlgorithm
+class VTKMIDSURFER_EXPORT vtkExtractMidsurfacePlus : public vtkImageAlgorithm
 {
 public:
 	enum ESmoothingMethod
