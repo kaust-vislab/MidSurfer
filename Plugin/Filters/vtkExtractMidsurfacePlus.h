@@ -8,7 +8,7 @@
 #include <vtkPoints.h>
 #include <vtkDataArray.h>
 #include <vtkCellArray.h>
-#include <vtkAppendPolyData.h>
+#include <vtkPolyData.h>
 #include <vtkConnectivityFilter.h>
 #include <vtkSmartPointer.h>
 
@@ -107,6 +107,12 @@ public:
 	vtkSetMacro(Morphological, unsigned int);
 	vtkGetMacro(Morphological, unsigned int);
 
+	vtkSetMacro(LabelExtentBorder, int);
+	vtkGetMacro(LabelExtentBorder, int);
+
+	vtkSetMacro(ZipperAlpha, double);
+	vtkGetMacro(ZipperAlpha, double);
+
 protected:
 	vtkExtractMidsurfacePlus();
 	~vtkExtractMidsurfacePlus();
@@ -121,9 +127,10 @@ private:
 
 	void ComputeGaussianSmoothing(vtkImageData *image);
 	void ComputeSmoothSignedDistanceMap(vtkImageData *image);
-	void ExtractMidsurface(vtkImageData *image, vtkAppendPolyData *append, int *dims);
+	void ExtractMidsurface(vtkImageData *image, vtkPolyData *mesh, int labelId);
+    void FindLabelExtent(int *labelExtent, int *extent, vtkImageData *image);
 
-	// std::vector<vtkExtractCenterLine*> centerlines;
+	int NumberOfLabels;
 
 	// GUI parameters
 	char *InputArray;
@@ -139,6 +146,8 @@ private:
 	bool GoldenSectionSearch;
 	bool ShapeDetection;
 	double Tolerance;
+	int LabelExtentBorder;
+	double ZipperAlpha;
 
 	// SDF parameters
 	unsigned int DistanceType; // 1 - 2D, 2 - 3D
