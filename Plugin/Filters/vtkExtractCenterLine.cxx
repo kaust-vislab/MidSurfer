@@ -486,7 +486,7 @@ namespace MidSurfer
 
 			centerline->SetPoints(points);
 
-			if ((this->ResultType == RESULT_TYPE_LINE_SET) && (centerline->GetNumberOfPoints() > 1)) // line set
+			if (((this->ResultType == RESULT_TYPE_LINE_SET) || this->ResultType == RESULT_TYPE_TRIANGULATION) && (centerline->GetNumberOfPoints() > 1)) // line set or triangulation
 			{
 				centerline->SetLines(lines);
 			}
