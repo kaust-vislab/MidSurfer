@@ -15,7 +15,7 @@
 typedef std::array<double, 3> Point3;
 typedef std::array<double, 3> Vector3;
 
-namespace Midsurfacer
+namespace MidSurfer
 {
 	namespace Tools
 	{

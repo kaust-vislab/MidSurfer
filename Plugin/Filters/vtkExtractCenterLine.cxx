@@ -42,7 +42,7 @@
 
 vtkStandardNewMacro(vtkExtractCenterLine);
 
-namespace Midsurfacer
+namespace MidSurfer
 {
 	namespace Tools
 	{
@@ -952,7 +952,7 @@ void vtkExtractCenterLine::ExtractCenterlineFromSlice(vtkImageData *slice, vtkAp
 			vtkLog(INFO, "RegionID: " << regionID << " has " << p.size() << " pixels.");
 		}
 
-		Midsurfacer::Tools::CenterlineFromRegionExtractor extract;
+		MidSurfer::Tools::CenterlineFromRegionExtractor extract;
 
 		// for (auto &[regionID, p] : startingPoints)
 
@@ -1019,7 +1019,7 @@ void vtkExtractCenterLine::ExtractCenterlineFromSlice(vtkImageData *slice, vtkAp
 		tens->SetResultArrayName("T");
 		tens->Update();
 
-		Midsurfacer::Tools::CenterlineFromRegionExtractor extract;
+		MidSurfer::Tools::CenterlineFromRegionExtractor extract;
 
 		for (Point3 p : this->StartPoints)
 		{

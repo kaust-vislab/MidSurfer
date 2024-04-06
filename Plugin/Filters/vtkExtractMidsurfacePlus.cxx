@@ -298,7 +298,7 @@ void vtkExtractMidsurfacePlus::ExtractMidsurface(vtkImageData *image, vtkPolyDat
 
 	append->GetOutput()->GetPointData()->AddArray(surfaceId);
 
-	if (this->ResultType == Midsurfacer::Tools::RESULT_TYPE_TRIANGULATION)
+	if (this->ResultType == MidSurfer::Tools::RESULT_TYPE_TRIANGULATION)
 	{
 		vtkNew<vtkZipperTriangulation> zipper;
 		zipper->SetInputConnection(append->GetOutputPort());
