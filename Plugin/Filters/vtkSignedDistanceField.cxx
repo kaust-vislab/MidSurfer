@@ -189,13 +189,13 @@ void vtkSignedDistanceField::ComputeStandardDeviations(vtkDoubleArray* dist)
 	{
 		this->StandardDeviations[0] = 1;
 		this->StandardDeviations[1] = 1;
-		// this->StandardDeviations[2] = 1;
+		this->StandardDeviations[2] = 1/2;
 		return;
 	}
 	else {
 		this->StandardDeviations[0] = max / this->SigmaDivisor;
 		this->StandardDeviations[1] = max / this->SigmaDivisor;
-		// this->StandardDeviations[2] = max / this->SigmaDivisor;
+		this->StandardDeviations[2] = (max / this->SigmaDivisor)/2;
 	}
 }
 

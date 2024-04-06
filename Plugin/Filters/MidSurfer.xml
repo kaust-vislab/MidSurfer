@@ -2,22 +2,24 @@
 
 	<ProxyGroup name="filters">
 
-		<SourceProxy name="ZipperTriangulation" class="vtkZipperTriangulation" label="Zipper Triangulation">
+		<SourceProxy name="ZipperTriangulation" class="vtkZipperTriangulation"
+			label="Zipper Triangulation">
 			<Documentation long_help="Long help." short_help="Short help.">
 				Description.
 			</Documentation>
 
 			<InputProperty name="Input" command="SetInputConnection">
 				<ProxyGroupDomain name="groups">
-					<Group name="sources"/>
-					<Group name="filters"/>
+					<Group name="sources" />
+					<Group name="filters" />
 				</ProxyGroupDomain>
 				<DataTypeDomain name="input_type">
-					<DataType value="vtkPolyData"/>
+					<DataType value="vtkPolyData" />
 				</DataTypeDomain>
 			</InputProperty>
 
-			<DoubleVectorProperty name="ZipperAlpha" command="SetZipperAlpha" number_of_elements="1" default_values="1.1" panel_visibility="advanced">
+			<DoubleVectorProperty name="ZipperAlpha" command="SetZipperAlpha" number_of_elements="1"
+				default_values="1.1" panel_visibility="advanced">
 			</DoubleVectorProperty>
 
 			<Hints>
@@ -27,31 +29,36 @@
 			<!-- End ZipperTriangulation -->
 		</SourceProxy>
 
-		<SourceProxy name="GeneratePointCloudFromSegmentationMask" class="vtkGeneratePointCloudFromSegmentationMask" label="Generate Point Cloud From Segmentation Mask">
+		<SourceProxy name="GeneratePointCloudFromSegmentationMask"
+			class="vtkGeneratePointCloudFromSegmentationMask"
+			label="Generate Point Cloud From Segmentation Mask">
 			<Documentation long_help="Long help." short_help="Short help.">
 				Description.
 			</Documentation>
 
 			<InputProperty name="Input" command="SetInputConnection">
 				<ProxyGroupDomain name="groups">
-					<Group name="sources"/>
-					<Group name="filters"/>
+					<Group name="sources" />
+					<Group name="filters" />
 				</ProxyGroupDomain>
 				<DataTypeDomain name="input_type">
-					<DataType value="vtkImageData"/>
+					<DataType value="vtkImageData" />
 				</DataTypeDomain>
 			</InputProperty>
 
-			<StringVectorProperty name="InputArray" label="Vectors" command="SetInputArray" element_types="2" number_of_elements="1">
-				<ArrayListDomain name="array_list" attribute_type="Scalars" input_domain_name="inputs_array">
+			<StringVectorProperty name="InputArray" label="Vectors" command="SetInputArray"
+				element_types="2" number_of_elements="1">
+				<ArrayListDomain name="array_list" attribute_type="Scalars"
+					input_domain_name="inputs_array">
 					<RequiredProperties>
 						<Property name="Input" function="Input" />
 					</RequiredProperties>
 				</ArrayListDomain>
 			</StringVectorProperty>
 
-			<IntVectorProperty name="ComputeNormals" command="SetComputeNormals" number_of_elements="1" default_values="0">
-				<BooleanDomain name="bool"/>
+			<IntVectorProperty name="ComputeNormals" command="SetComputeNormals"
+				number_of_elements="1" default_values="0">
+				<BooleanDomain name="bool" />
 			</IntVectorProperty>
 
 			<Hints>
@@ -61,129 +68,144 @@
 			<!-- End GeneratePointCloudFromSegmentationMask -->
 		</SourceProxy>
 
-		<SourceProxy name="ComputeEigenVectorField" class="vtkComputeEigenVectorField" label="Compute Eigen Vector Field">
+		<SourceProxy name="ComputeEigenVectorField" class="vtkComputeEigenVectorField"
+			label="Compute Eigen Vector Field">
 			<Documentation long_help="Long help." short_help="Short help.">
 				Description.
 			</Documentation>
 			<InputProperty name="Input" command="SetInputConnection">
 				<ProxyGroupDomain name="groups">
-					<Group name="sources"/>
-					<Group name="filters"/>
+					<Group name="sources" />
+					<Group name="filters" />
 				</ProxyGroupDomain>
 				<DataTypeDomain name="input_type">
-					<DataType value="vtkImageData"/>
+					<DataType value="vtkImageData" />
 				</DataTypeDomain>
 			</InputProperty>
-			<StringVectorProperty name="InputArray" label="Input Array" command="SetInputArray" element_types="2" number_of_elements="1">
-				<ArrayListDomain name="array_list" attribute_type="Scalars" input_domain_name="inputs_array">
+			<StringVectorProperty name="InputArray" label="Input Array" command="SetInputArray"
+				element_types="2" number_of_elements="1">
+				<ArrayListDomain name="array_list" attribute_type="Scalars"
+					input_domain_name="inputs_array">
 					<RequiredProperties>
 						<Property name="Input" function="Input" />
 					</RequiredProperties>
 				</ArrayListDomain>
 			</StringVectorProperty>
-			<IntVectorProperty name="SmoothInput" command="SetSmoothInput" number_of_elements="1" default_values="3">
+			<IntVectorProperty name="SmoothInput" command="SetSmoothInput" number_of_elements="1"
+				default_values="3">
 				<EnumerationDomain name="enum">
-					<Entry value="1" text="No smoothing"/>
-					<Entry value="2" text="Gaussian smoothing"/>
-					<Entry value="3" text="Signed distance map (simple)"/>
-					<Entry value="4" text="Signed distance map"/>
+					<Entry value="1" text="No smoothing" />
+					<Entry value="2" text="Gaussian smoothing" />
+					<Entry value="3" text="Signed distance map (simple)" />
+					<Entry value="4" text="Signed distance map" />
 				</EnumerationDomain>
 				<Documentation>
 					This property indicates which type will be used to return the result.
 				</Documentation>
 			</IntVectorProperty>
-			<IntVectorProperty name="FieldType" command="SetFieldType" number_of_elements="1" default_values="1">
+			<IntVectorProperty name="FieldType" command="SetFieldType" number_of_elements="1"
+				default_values="1">
 				<EnumerationDomain name="enum">
-					<Entry value="1" text="Inside"/>
-					<Entry value="2" text="Outside"/>
-					<Entry value="3" text="Both"/>
+					<Entry value="1" text="Inside" />
+					<Entry value="2" text="Outside" />
+					<Entry value="3" text="Both" />
 				</EnumerationDomain>
 				<Documentation>
 					This property indicates which type of distance field we are calculating.
 				</Documentation>
 				<Hints>
 					<PropertyWidgetDecorator type="GenericDecorator"
-											 mode="visibility"
-											 property="SmoothInput"
-											 value="4" />
+						mode="visibility"
+						property="SmoothInput"
+						value="4" />
 					<!-- show this widget when SmoothInput==4 -->
 				</Hints>
 			</IntVectorProperty>
 
-			<IntVectorProperty name="DistanceType" command="SetDistanceType" number_of_elements="1" default_values="1">
+			<IntVectorProperty name="DistanceType" command="SetDistanceType" number_of_elements="1"
+				default_values="1">
 				<EnumerationDomain name="enum">
-					<Entry value="1" text="Minkowski"/>
-					<Entry value="2" text="Chebyshev"/>
-					<Entry value="3" text="Quadratic"/>
-					<Entry value="4" text="Fast marching"/>
+					<Entry value="1" text="Minkowski" />
+					<Entry value="2" text="Chebyshev" />
+					<Entry value="3" text="Quadratic" />
+					<Entry value="4" text="Fast marching" />
 				</EnumerationDomain>
 				<Documentation>
-					This property indicates what type of metric we use to calculate the distance field.
+					This property indicates what type of metric we use to calculate the distance
+					field.
 				</Documentation>
 				<Hints>
 					<PropertyWidgetDecorator type="GenericDecorator"
-											 mode="visibility"
-											 property="SmoothInput"
-											 value="4" />
+						mode="visibility"
+						property="SmoothInput"
+						value="4" />
 					<!-- show this widget when SmoothInput==4 -->
 				</Hints>
 			</IntVectorProperty>
 
-			<DoubleVectorProperty name="ExponentDist" command="SetExponentDist" number_of_elements="1" default_values="0.5" panel_visibility="advanced">
+			<DoubleVectorProperty name="ExponentDist" command="SetExponentDist"
+				number_of_elements="1" default_values="0.5" panel_visibility="advanced">
 			</DoubleVectorProperty>
 
-			<DoubleVectorProperty name="Exponent" command="SetExponent" number_of_elements="1" default_values="2.0" panel_visibility="advanced">
+			<DoubleVectorProperty name="Exponent" command="SetExponent" number_of_elements="1"
+				default_values="2.0" panel_visibility="advanced">
 				<Documentation>
-					This property indicates what exponent we are using for Minkowski distance (1 = Manhattan, 2 = Euclidean). If other distances are selected, it is ignored.
+					This property indicates what exponent we are using for Minkowski distance (1 =
+					Manhattan, 2 = Euclidean). If other distances are selected, it is ignored.
 				</Documentation>
 				<Hints>
 					<PropertyWidgetDecorator type="GenericDecorator"
-											 mode="visibility"
-											 property="SmoothInput"
-											 value="4" />
+						mode="visibility"
+						property="SmoothInput"
+						value="4" />
 					<!-- show this widget when SmoothInput==4 -->
 				</Hints>
 			</DoubleVectorProperty>
 
-			<DoubleVectorProperty name="Threshold" command="SetThreshold" number_of_elements="1" default_values="0.5" panel_visibility="advanced">
+			<DoubleVectorProperty name="Threshold" command="SetThreshold" number_of_elements="1"
+				default_values="0.5" panel_visibility="advanced">
 			</DoubleVectorProperty>
 
-			<DoubleVectorProperty name="RadiusFactors" command="SetRadiusFactors" number_of_elements="3" default_values="4.0 4.0 4.0" panel_visibility="advanced">
+			<DoubleVectorProperty name="RadiusFactors" command="SetRadiusFactors"
+				number_of_elements="3" default_values="4.0 4.0 4.0" panel_visibility="advanced">
 				<Hints>
 					<PropertyWidgetDecorator type="GenericDecorator"
-											 mode="visibility"
-											 property="SmoothInput"
-											 value="2" />
+						mode="visibility"
+						property="SmoothInput"
+						value="2" />
 					<!-- show this widget when SmoothInput==2 -->
 				</Hints>
 			</DoubleVectorProperty>
 
-			<DoubleVectorProperty name="StandardDeviations" command="SetStandardDeviations" number_of_elements="3" default_values="5.0 5.0 5.0" panel_visibility="advanced">
+			<DoubleVectorProperty name="StandardDeviations" command="SetStandardDeviations"
+				number_of_elements="3" default_values="5.0 5.0 5.0" panel_visibility="advanced">
 				<Hints>
 					<PropertyWidgetDecorator type="GenericDecorator"
-											 mode="visibility"
-											 property="SmoothInput"
-											 value="2" />
+						mode="visibility"
+						property="SmoothInput"
+						value="2" />
 					<!-- show this widget when SmoothInput==2 -->
 				</Hints>
 			</DoubleVectorProperty>
 
-			<DoubleVectorProperty name="RadiusFactorsSDF" command="SetRadiusFactorsSDF" number_of_elements="3" default_values="2.0 2.0 2.0" panel_visibility="advanced">
+			<DoubleVectorProperty name="RadiusFactorsSDF" command="SetRadiusFactorsSDF"
+				number_of_elements="3" default_values="2.0 2.0 2.0" panel_visibility="advanced">
 				<Hints>
 					<PropertyWidgetDecorator type="GenericDecorator"
-											 mode="visibility"
-											 property="SmoothInput"
-											 value="3" />
+						mode="visibility"
+						property="SmoothInput"
+						value="3" />
 					<!-- show this widget when SmoothInput==3 -->
 				</Hints>
 			</DoubleVectorProperty>
 
-			<DoubleVectorProperty name="StandardDeviationsSDF" command="SetStandardDeviationsSDF" number_of_elements="3" default_values="1.5 1.5 1.5" panel_visibility="advanced">
+			<DoubleVectorProperty name="StandardDeviationsSDF" command="SetStandardDeviationsSDF"
+				number_of_elements="3" default_values="1.5 1.5 1.5" panel_visibility="advanced">
 				<Hints>
 					<PropertyWidgetDecorator type="GenericDecorator"
-											 mode="visibility"
-											 property="SmoothInput"
-											 value="3" />
+						mode="visibility"
+						property="SmoothInput"
+						value="3" />
 					<!-- show this widget when SmoothInput==3 -->
 				</Hints>
 			</DoubleVectorProperty>
@@ -195,36 +217,42 @@
 			<!-- End ComputeEigenVectorField -->
 		</SourceProxy>
 
-		<SourceProxy name="ConnectedCommponentsBinaryImage" class="vtkConnectedCommponentsBinaryImage" label="Compute Connected Commponents in Binary Image">
+		<SourceProxy name="ConnectedCommponentsBinaryImage"
+			class="vtkConnectedCommponentsBinaryImage"
+			label="Compute Connected Commponents in Binary Image">
 			<Documentation long_help="Long help." short_help="Short help.">
 				Description.
 			</Documentation>
 
 			<InputProperty name="Input" command="SetInputConnection">
 				<ProxyGroupDomain name="groups">
-					<Group name="sources"/>
-					<Group name="filters"/>
+					<Group name="sources" />
+					<Group name="filters" />
 				</ProxyGroupDomain>
 				<DataTypeDomain name="input_type">
-					<DataType value="vtkImageData"/>
+					<DataType value="vtkImageData" />
 				</DataTypeDomain>
 			</InputProperty>
 
-			<StringVectorProperty name="InputArray" label="Input mask" command="SetInputArray" element_types="2" number_of_elements="1">
-				<ArrayListDomain name="array_list" attribute_type="Scalars" input_domain_name="inputs_array">
+			<StringVectorProperty name="InputArray" label="Input mask" command="SetInputArray"
+				element_types="2" number_of_elements="1">
+				<ArrayListDomain name="array_list" attribute_type="Scalars"
+					input_domain_name="inputs_array">
 					<RequiredProperties>
 						<Property name="Input" function="Input" />
 					</RequiredProperties>
 				</ArrayListDomain>
 			</StringVectorProperty>
 
-			<IntVectorProperty name="Connectivity" command="SetConnectivity" number_of_elements="1" default_values="8">
+			<IntVectorProperty name="Connectivity" command="SetConnectivity" number_of_elements="1"
+				default_values="8">
 				<EnumerationDomain name="enum">
-					<Entry value="4" text="4-connectivity"/>
-					<Entry value="8" text="8-connectivity"/>
+					<Entry value="4" text="4-connectivity" />
+					<Entry value="8" text="8-connectivity" />
 				</EnumerationDomain>
 				<Documentation>
-					This property indicates what type of metric we use to calculate the distance field.
+					This property indicates what type of metric we use to calculate the distance
+					field.
 				</Documentation>
 			</IntVectorProperty>
 
@@ -235,178 +263,201 @@
 			<!-- End ConnectedCommponentsBinaryImage -->
 		</SourceProxy>
 
-		<SourceProxy name="ExtractCenterLine" class="vtkExtractCenterLine" label="Extract Center Line">
+		<SourceProxy name="ExtractCenterLine" class="vtkExtractCenterLine"
+			label="Extract Center Line">
 			<Documentation long_help="Long help." short_help="Short help.">
 				Description.
 			</Documentation>
 			<InputProperty name="Input" command="SetInputConnection">
 				<ProxyGroupDomain name="groups">
-					<Group name="sources"/>
-					<Group name="filters"/>
+					<Group name="sources" />
+					<Group name="filters" />
 				</ProxyGroupDomain>
 				<DataTypeDomain name="input_type">
-					<DataType value="vtkImageData"/>
+					<DataType value="vtkImageData" />
 				</DataTypeDomain>
 			</InputProperty>
 
-			<StringVectorProperty name="InputArray" label="Input mask" command="SetInputArray" element_types="2" number_of_elements="1">
-				<ArrayListDomain name="array_list" attribute_type="Scalars" input_domain_name="inputs_array">
+			<StringVectorProperty name="InputArray" label="Input mask" command="SetInputArray"
+				element_types="2" number_of_elements="1">
+				<ArrayListDomain name="array_list" attribute_type="Scalars"
+					input_domain_name="inputs_array">
 					<RequiredProperties>
 						<Property name="Input" function="Input" />
 					</RequiredProperties>
 				</ArrayListDomain>
 			</StringVectorProperty>
 
-			<IntVectorProperty name="AutomaticStepSize" command="SetAutomaticStepSize" number_of_elements="1" default_values="1" panel_visibility="advanced">
-				<BooleanDomain name="bool"/>
+			<IntVectorProperty name="AutomaticStepSize" command="SetAutomaticStepSize"
+				number_of_elements="1" default_values="1" panel_visibility="advanced">
+				<BooleanDomain name="bool" />
 			</IntVectorProperty>
 
-			<DoubleVectorProperty name="IntegrationStep" command="SetIntegrationStep" number_of_elements="1" default_values="0.5" panel_visibility="advanced">
+			<DoubleVectorProperty name="IntegrationStep" command="SetIntegrationStep"
+				number_of_elements="1" default_values="0.5" panel_visibility="advanced">
 				<Hints>
 					<PropertyWidgetDecorator type="GenericDecorator"
-											 mode="visibility"
-											 property="AutomaticStepSize"
-											 value="0" />
+						mode="visibility"
+						property="AutomaticStepSize"
+						value="0" />
 					<!-- show this widget when AutomaticStepSize==false -->
 				</Hints>
 			</DoubleVectorProperty>
 
-			<IntVectorProperty name="GoldenSectionSearch" command="SetGoldenSectionSearch" number_of_elements="1" default_values="1" panel_visibility="advanced">
-				<BooleanDomain name="bool"/>
+			<IntVectorProperty name="GoldenSectionSearch" command="SetGoldenSectionSearch"
+				number_of_elements="1" default_values="1" panel_visibility="advanced">
+				<BooleanDomain name="bool" />
 			</IntVectorProperty>
 
-			<IntVectorProperty name="ShapeDetection" command="SetShapeDetection" number_of_elements="1" default_values="1" panel_visibility="advanced">
-				<BooleanDomain name="bool"/>
+			<IntVectorProperty name="ShapeDetection" command="SetShapeDetection"
+				number_of_elements="1" default_values="1" panel_visibility="advanced">
+				<BooleanDomain name="bool" />
 			</IntVectorProperty>
 
-			<IntVectorProperty name="SmoothInput" command="SetSmoothInput" number_of_elements="1" default_values="2" panel_visibility="advanced">
+			<IntVectorProperty name="SmoothInput" command="SetSmoothInput" number_of_elements="1"
+				default_values="2" panel_visibility="advanced">
 				<EnumerationDomain name="enum">
-					<Entry value="1" text="No smoothing"/>
-					<Entry value="2" text="Gaussian smoothing 2D"/>
-					<Entry value="4" text="Signed distance map (simple)"/>
-					<Entry value="5" text="Signed distance map"/>
+					<Entry value="1" text="No smoothing" />
+					<Entry value="2" text="Gaussian smoothing 2D" />
+					<Entry value="4" text="Signed distance map (simple)" />
+					<Entry value="5" text="Signed distance map" />
 				</EnumerationDomain>
 				<Documentation>
 					This property indicates which type will be used to return the result.
 				</Documentation>
 			</IntVectorProperty>
 
-			<DoubleVectorProperty name="RadiusFactors" command="SetRadiusFactors" number_of_elements="3" default_values="4.0 4.0 4.0" panel_visibility="advanced">
+			<DoubleVectorProperty name="RadiusFactors" command="SetRadiusFactors"
+				number_of_elements="3" default_values="4.0 4.0 4.0" panel_visibility="advanced">
 				<Hints>
 					<PropertyWidgetDecorator type="GenericDecorator"
-											 mode="visibility"
-											 property="SmoothInput"
-											 value="2" />
+						mode="visibility"
+						property="SmoothInput"
+						value="2" />
 					<!-- show this widget when SmoothInput==2 -->
 				</Hints>
 			</DoubleVectorProperty>
 
-			<DoubleVectorProperty name="StandardDeviations" command="SetStandardDeviations" number_of_elements="3" default_values="5.0 5.0 5.0" panel_visibility="advanced">
+			<DoubleVectorProperty name="StandardDeviations" command="SetStandardDeviations"
+				number_of_elements="3" default_values="5.0 5.0 5.0" panel_visibility="advanced">
 				<Hints>
 					<PropertyWidgetDecorator type="GenericDecorator"
-											 mode="visibility"
-											 property="SmoothInput"
-											 value="2" />
+						mode="visibility"
+						property="SmoothInput"
+						value="2" />
 					<!-- show this widget when SmoothInput==2 -->
 				</Hints>
 			</DoubleVectorProperty>
 
-			<DoubleVectorProperty name="RadiusFactorsSDF" command="SetRadiusFactorsSDF" number_of_elements="3" default_values="2.0 2.0 2.0" panel_visibility="advanced">
+			<DoubleVectorProperty name="RadiusFactorsSDF" command="SetRadiusFactorsSDF"
+				number_of_elements="3" default_values="2.0 2.0 2.0" panel_visibility="advanced">
 				<Hints>
 					<PropertyWidgetDecorator type="GenericDecorator"
-											 mode="visibility"
-											 property="SmoothInput"
-											 value="4" />
+						mode="visibility"
+						property="SmoothInput"
+						value="4" />
 					<!-- show this widget when SmoothInput==3 -->
 				</Hints>
 			</DoubleVectorProperty>
 
-			<DoubleVectorProperty name="StandardDeviationsSDF" command="SetStandardDeviationsSDF" number_of_elements="3" default_values="1.5 1.5 1.5" panel_visibility="advanced">
+			<DoubleVectorProperty name="StandardDeviationsSDF" command="SetStandardDeviationsSDF"
+				number_of_elements="3" default_values="1.5 1.5 1.5" panel_visibility="advanced">
 				<Hints>
 					<PropertyWidgetDecorator type="GenericDecorator"
-											 mode="visibility"
-											 property="SmoothInput"
-											 value="4" />
+						mode="visibility"
+						property="SmoothInput"
+						value="4" />
 					<!-- show this widget when SmoothInput==3 -->
 				</Hints>
 			</DoubleVectorProperty>
 
-			<IntVectorProperty name="FieldType" command="SetFieldType" number_of_elements="1" default_values="1">
+			<IntVectorProperty name="FieldType" command="SetFieldType" number_of_elements="1"
+				default_values="1">
 				<EnumerationDomain name="enum">
-					<Entry value="1" text="Inside"/>
-					<Entry value="2" text="Outside"/>
-					<Entry value="3" text="Both"/>
+					<Entry value="1" text="Inside" />
+					<Entry value="2" text="Outside" />
+					<Entry value="3" text="Both" />
 				</EnumerationDomain>
 				<Documentation>
 					This property indicates which type of distance field we are calculating.
 				</Documentation>
 				<Hints>
 					<PropertyWidgetDecorator type="GenericDecorator"
-											 mode="visibility"
-											 property="SmoothInput"
-											 value="5" />
+						mode="visibility"
+						property="SmoothInput"
+						value="5" />
 					<!-- show this widget when SmoothInput==4 -->
 				</Hints>
 			</IntVectorProperty>
 
-			<IntVectorProperty name="DistanceType" command="SetDistanceType" number_of_elements="1" default_values="1">
+			<IntVectorProperty name="DistanceType" command="SetDistanceType" number_of_elements="1"
+				default_values="1">
 				<EnumerationDomain name="enum">
-					<Entry value="1" text="Minkowski"/>
-					<Entry value="2" text="Chebyshev"/>
-					<Entry value="3" text="Quadratic"/>
-					<Entry value="4" text="Fast marching"/>
+					<Entry value="1" text="Minkowski" />
+					<Entry value="2" text="Chebyshev" />
+					<Entry value="3" text="Quadratic" />
+					<Entry value="4" text="Fast marching" />
 				</EnumerationDomain>
 				<Documentation>
-					This property indicates what type of metric we use to calculate the distance field.
+					This property indicates what type of metric we use to calculate the distance
+					field.
 				</Documentation>
 				<Hints>
 					<PropertyWidgetDecorator type="GenericDecorator"
-											 mode="visibility"
-											 property="SmoothInput"
-											 value="5" />
+						mode="visibility"
+						property="SmoothInput"
+						value="5" />
 					<!-- show this widget when SmoothInput==4 -->
 				</Hints>
 			</IntVectorProperty>
 
-			<DoubleVectorProperty name="ExponentDist" command="SetExponentDist" number_of_elements="1" default_values="0.5" panel_visibility="advanced">
+			<DoubleVectorProperty name="ExponentDist" command="SetExponentDist"
+				number_of_elements="1" default_values="0.5" panel_visibility="advanced">
 			</DoubleVectorProperty>
 
-			<DoubleVectorProperty name="Exponent" command="SetExponent" number_of_elements="1" default_values="2.0" panel_visibility="advanced">
+			<DoubleVectorProperty name="Exponent" command="SetExponent" number_of_elements="1"
+				default_values="2.0" panel_visibility="advanced">
 				<Documentation>
-					This property indicates what exponent we are using for Minkowski distance (1 = Manhattan, 2 = Euclidean). If other distances are selected, it is ignored.
+					This property indicates what exponent we are using for Minkowski distance (1 =
+					Manhattan, 2 = Euclidean). If other distances are selected, it is ignored.
 				</Documentation>
 				<Hints>
 					<PropertyWidgetDecorator type="GenericDecorator"
-											 mode="visibility"
-											 property="SmoothInput"
-											 value="5" />
+						mode="visibility"
+						property="SmoothInput"
+						value="5" />
 					<!-- show this widget when SmoothInput==4 -->
 				</Hints>
 			</DoubleVectorProperty>
 
-			<DoubleVectorProperty name="Threshold" command="SetThreshold" number_of_elements="1" default_values="0.15" panel_visibility="advanced">
+			<DoubleVectorProperty name="Threshold" command="SetThreshold" number_of_elements="1"
+				default_values="0.15" panel_visibility="advanced">
 			</DoubleVectorProperty>
 
-			<DoubleVectorProperty name="Tolerance" command="SetTolerance" number_of_elements="1" default_values="0.1" panel_visibility="advanced">
+			<DoubleVectorProperty name="Tolerance" command="SetTolerance" number_of_elements="1"
+				default_values="0.1" panel_visibility="advanced">
 			</DoubleVectorProperty>
 
-			<IntVectorProperty name="ResultType" command="SetResultType" number_of_elements="1" default_values="1">
+			<IntVectorProperty name="ResultType" command="SetResultType" number_of_elements="1"
+				default_values="1">
 				<EnumerationDomain name="enum">
-					<Entry value="1" text="Return result as line set."/>
-					<Entry value="2" text="Return result as point set."/>
+					<Entry value="1" text="Return result as line set." />
+					<Entry value="2" text="Return result as point set." />
 				</EnumerationDomain>
 				<Documentation>
 					This property indicates which type will be used to return the result.
 				</Documentation>
 			</IntVectorProperty>
 
-			<IntVectorProperty name="Connectivity" command="SetConnectivity" number_of_elements="1" default_values="8" panel_visibility="advanced">
+			<IntVectorProperty name="Connectivity" command="SetConnectivity" number_of_elements="1"
+				default_values="8" panel_visibility="advanced">
 				<EnumerationDomain name="enum">
-					<Entry value="4" text="4-connectivity"/>
-					<Entry value="8" text="8-connectivity"/>
+					<Entry value="4" text="4-connectivity" />
+					<Entry value="8" text="8-connectivity" />
 				</EnumerationDomain>
 				<Documentation>
-					This property indicates what type of connectivity we use to calculate the connected components.
+					This property indicates what type of connectivity we use to calculate the
+					connected components.
 				</Documentation>
 			</IntVectorProperty>
 
@@ -417,236 +468,265 @@
 			<!-- End ComputeEigenVectorField -->
 		</SourceProxy>
 
-		<SourceProxy name="ExtractMidsurface" class="vtkExtractMidsurface" label="Extract Midsurface">
+		<SourceProxy name="ExtractMidsurface" class="vtkExtractMidsurface"
+			label="Extract Midsurface">
 			<Documentation long_help="Long help." short_help="Short help.">
 				Description.
 			</Documentation>
 			<InputProperty name="Input" command="SetInputConnection">
 				<ProxyGroupDomain name="groups">
-					<Group name="sources"/>
-					<Group name="filters"/>
+					<Group name="sources" />
+					<Group name="filters" />
 				</ProxyGroupDomain>
 				<DataTypeDomain name="input_type">
-					<DataType value="vtkImageData"/>
+					<DataType value="vtkImageData" />
 				</DataTypeDomain>
 			</InputProperty>
 
-			<StringVectorProperty name="InputArray" label="Input mask" command="SetInputArray" element_types="2" number_of_elements="1">
-				<ArrayListDomain name="array_list" attribute_type="Scalars" input_domain_name="inputs_array">
+			<StringVectorProperty name="InputArray" label="Input mask" command="SetInputArray"
+				element_types="2" number_of_elements="1">
+				<ArrayListDomain name="array_list" attribute_type="Scalars"
+					input_domain_name="inputs_array">
 					<RequiredProperties>
 						<Property name="Input" function="Input" />
 					</RequiredProperties>
 				</ArrayListDomain>
 			</StringVectorProperty>
 
-			<IntVectorProperty name="AutomaticStepSize" command="SetAutomaticStepSize" number_of_elements="1" default_values="1" panel_visibility="advanced">
-				<BooleanDomain name="bool"/>
+			<IntVectorProperty name="AutomaticStepSize" command="SetAutomaticStepSize"
+				number_of_elements="1" default_values="1" panel_visibility="advanced">
+				<BooleanDomain name="bool" />
 			</IntVectorProperty>
 
-			<DoubleVectorProperty name="IntegrationStep" command="SetIntegrationStep" number_of_elements="1" default_values="0.5" panel_visibility="advanced">
+			<DoubleVectorProperty name="IntegrationStep" command="SetIntegrationStep"
+				number_of_elements="1" default_values="0.5" panel_visibility="advanced">
 				<Hints>
 					<PropertyWidgetDecorator type="GenericDecorator"
-											 mode="visibility"
-											 property="AutomaticStepSize"
-											 value="0" />
+						mode="visibility"
+						property="AutomaticStepSize"
+						value="0" />
 					<!-- show this widget when AutomaticStepSize==false -->
 				</Hints>
 			</DoubleVectorProperty>
 
-			<IntVectorProperty name="GoldenSectionSearch" command="SetGoldenSectionSearch" number_of_elements="1" default_values="1" panel_visibility="advanced">
-				<BooleanDomain name="bool"/>
+			<IntVectorProperty name="GoldenSectionSearch" command="SetGoldenSectionSearch"
+				number_of_elements="1" default_values="1" panel_visibility="advanced">
+				<BooleanDomain name="bool" />
 			</IntVectorProperty>
 
-			<IntVectorProperty name="ShapeDetection" command="SetShapeDetection" number_of_elements="1" default_values="1" panel_visibility="advanced">
-				<BooleanDomain name="bool"/>
+			<IntVectorProperty name="ShapeDetection" command="SetShapeDetection"
+				number_of_elements="1" default_values="1" panel_visibility="advanced">
+				<BooleanDomain name="bool" />
 			</IntVectorProperty>
 
-			<IntVectorProperty name="SmoothInput" command="SetSmoothInput" number_of_elements="1" default_values="6" panel_visibility="advanced">
+			<IntVectorProperty name="SmoothInput" command="SetSmoothInput" number_of_elements="1"
+				default_values="6" panel_visibility="advanced">
 				<EnumerationDomain name="enum">
-					<Entry value="1" text="No smoothing"/>
-					<Entry value="2" text="Gaussian smoothing 2D"/>
-					<Entry value="3" text="Gaussian smoothing 3D"/>
-					<Entry value="4" text="Signed distance map (simple)"/>
-					<Entry value="5" text="Signed distance map"/>
-					<Entry value="6" text="Signed distance smooth 3D"/>
+					<Entry value="1" text="No smoothing" />
+					<Entry value="2" text="Gaussian smoothing 2D" />
+					<Entry value="3" text="Gaussian smoothing 3D" />
+					<Entry value="4" text="Signed distance map (simple)" />
+					<Entry value="5" text="Signed distance map" />
+					<Entry value="6" text="Signed distance smooth 3D" />
 				</EnumerationDomain>
 				<Documentation>
 					This property indicates which type will be used to return the result.
 				</Documentation>
 			</IntVectorProperty>
 
-			<DoubleVectorProperty name="RadiusFactors" command="SetRadiusFactors" number_of_elements="3" default_values="4.0 4.0 4.0" panel_visibility="advanced">
+			<DoubleVectorProperty name="RadiusFactors" command="SetRadiusFactors"
+				number_of_elements="3" default_values="4.0 4.0 4.0" panel_visibility="advanced">
 				<Hints>
 					<PropertyWidgetDecorator type="GenericDecorator"
-											 mode="visibility"
-											 property="SmoothInput"
-											 value="3" />
+						mode="visibility"
+						property="SmoothInput"
+						value="3" />
 					<!-- show this widget when SmoothInput==2 -->
 				</Hints>
 			</DoubleVectorProperty>
 
-			<DoubleVectorProperty name="StandardDeviations" command="SetStandardDeviations" number_of_elements="3" default_values="5.0 5.0 5.0" panel_visibility="advanced">
+			<DoubleVectorProperty name="StandardDeviations" command="SetStandardDeviations"
+				number_of_elements="3" default_values="5.0 5.0 5.0" panel_visibility="advanced">
 				<Hints>
 					<PropertyWidgetDecorator type="GenericDecorator"
-											 mode="visibility"
-											 property="SmoothInput"
-											 value="3" />
+						mode="visibility"
+						property="SmoothInput"
+						value="3" />
 					<!-- show this widget when SmoothInput==2 -->
 				</Hints>
 			</DoubleVectorProperty>
 
-			<DoubleVectorProperty name="RadiusFactorsSDF" command="SetRadiusFactorsSDF" number_of_elements="3" default_values="2.0 2.0 2.0" panel_visibility="advanced">
+			<DoubleVectorProperty name="RadiusFactorsSDF" command="SetRadiusFactorsSDF"
+				number_of_elements="3" default_values="2.0 2.0 2.0" panel_visibility="advanced">
 				<Hints>
 					<PropertyWidgetDecorator type="GenericDecorator"
-											 mode="visibility"
-											 property="SmoothInput"
-											 value="4" />
+						mode="visibility"
+						property="SmoothInput"
+						value="4" />
 					<!-- show this widget when SmoothInput==3 -->
 				</Hints>
 			</DoubleVectorProperty>
 
-			<DoubleVectorProperty name="StandardDeviationsSDF" command="SetStandardDeviationsSDF" number_of_elements="3" default_values="1.5 1.5 1.5" panel_visibility="advanced">
+			<DoubleVectorProperty name="StandardDeviationsSDF" command="SetStandardDeviationsSDF"
+				number_of_elements="3" default_values="1.5 1.5 1.5" panel_visibility="advanced">
 				<Hints>
 					<PropertyWidgetDecorator type="GenericDecorator"
-											 mode="visibility"
-											 property="SmoothInput"
-											 value="4" />
+						mode="visibility"
+						property="SmoothInput"
+						value="4" />
 					<!-- show this widget when SmoothInput==3 -->
 				</Hints>
 			</DoubleVectorProperty>
 
-			<IntVectorProperty name="FieldType" command="SetFieldType" number_of_elements="1" default_values="1" panel_visibility="advanced">
+			<IntVectorProperty name="FieldType" command="SetFieldType" number_of_elements="1"
+				default_values="1" panel_visibility="advanced">
 				<EnumerationDomain name="enum">
-					<Entry value="1" text="Inside"/>
-					<Entry value="2" text="Outside"/>
-					<Entry value="3" text="Both"/>
+					<Entry value="1" text="Inside" />
+					<Entry value="2" text="Outside" />
+					<Entry value="3" text="Both" />
 				</EnumerationDomain>
 				<Documentation>
 					This property indicates which type of distance field we are calculating.
 				</Documentation>
 				<Hints>
 					<PropertyWidgetDecorator type="GenericDecorator"
-											 mode="visibility"
-											 property="SmoothInput"
-											 value="5" />
+						mode="visibility"
+						property="SmoothInput"
+						value="5" />
 					<!-- show this widget when SmoothInput==4 -->
 				</Hints>
 			</IntVectorProperty>
 
-			<IntVectorProperty name="DistanceType" command="SetDistanceType" number_of_elements="1" default_values="2" panel_visibility="advanced">
+			<IntVectorProperty name="DistanceType" command="SetDistanceType" number_of_elements="1"
+				default_values="2" panel_visibility="advanced">
 				<EnumerationDomain name="enum">
-					<Entry value="1" text="2D"/>
-					<Entry value="2" text="3D"/>
+					<Entry value="1" text="2D" />
+					<Entry value="2" text="3D" />
 				</EnumerationDomain>
 				<Documentation>
-					This property indicates if we want to calculate signed distance per slice or for the entire volume.
+					This property indicates if we want to calculate signed distance per slice or for
+					the entire volume.
 				</Documentation>
 			</IntVectorProperty>
 
-			<IntVectorProperty name="LabelExtentBorder" command="SetLabelExtentBorder" number_of_elements="1" default_values="3" panel_visibility="advanced">
+			<IntVectorProperty name="LabelExtentBorder" command="SetLabelExtentBorder"
+				number_of_elements="1" default_values="3" panel_visibility="advanced">
 			</IntVectorProperty>
 
-			<IntVectorProperty name="Smoothing" command="SetSmoothing" number_of_elements="1" default_values="1" panel_visibility="advanced">
-				<BooleanDomain name="bool"/>
+			<IntVectorProperty name="Smoothing" command="SetSmoothing" number_of_elements="1"
+				default_values="1" panel_visibility="advanced">
+				<BooleanDomain name="bool" />
 			</IntVectorProperty>
 
-			<IntVectorProperty name="ManualSmoothing" command="SetManualSmoothing" number_of_elements="1" default_values="0" panel_visibility="advanced">
-				<BooleanDomain name="bool"/>
+			<IntVectorProperty name="ManualSmoothing" command="SetManualSmoothing"
+				number_of_elements="1" default_values="0" panel_visibility="advanced">
+				<BooleanDomain name="bool" />
 				<Hints>
 					<PropertyWidgetDecorator type="GenericDecorator"
-											 mode="visibility"
-											 property="SmoothInput"
-											 value="5" />
+						mode="visibility"
+						property="SmoothInput"
+						value="5" />
 					<!-- show this widget when SmoothInput==4 -->
 				</Hints>
 			</IntVectorProperty>
 
-			<DoubleVectorProperty name="SDFRadiusFactors" command="SetSDFRadiusFactors" number_of_elements="3" default_values="4.0 4.0 4.0" panel_visibility="advanced">
+			<DoubleVectorProperty name="SDFRadiusFactors" command="SetSDFRadiusFactors"
+				number_of_elements="3" default_values="4.0 4.0 4.0" panel_visibility="advanced">
 				<Hints>
 					<PropertyWidgetDecorator type="GenericDecorator"
-											 mode="visibility"
-											 property="ManualSmoothing"
-											 value="1" />
+						mode="visibility"
+						property="ManualSmoothing"
+						value="1" />
 					<!-- show this widget when ManualSmoothing==1 -->
 				</Hints>
 			</DoubleVectorProperty>
 
-			<DoubleVectorProperty name="SDFStandardDeviations" command="SetSDFStandardDeviations" number_of_elements="3" default_values="5.0 5.0 5.0" panel_visibility="advanced">
+			<DoubleVectorProperty name="SDFStandardDeviations" command="SetSDFStandardDeviations"
+				number_of_elements="3" default_values="5.0 5.0 5.0" panel_visibility="advanced">
 				<Hints>
 					<PropertyWidgetDecorator type="GenericDecorator"
-											 mode="visibility"
-											 property="ManualSmoothing"
-											 value="1" />
+						mode="visibility"
+						property="ManualSmoothing"
+						value="1" />
 					<!-- show this widget when ManualSmoothing==1 -->
 				</Hints>
 			</DoubleVectorProperty>
 
-			<DoubleVectorProperty name="SigmaDivisor" command="SetSigmaDivisor" number_of_elements="1" default_values="3.0" panel_visibility="advanced">
+			<DoubleVectorProperty name="SigmaDivisor" command="SetSigmaDivisor"
+				number_of_elements="1" default_values="3.0" panel_visibility="advanced">
 				<Hints>
 					<PropertyWidgetDecorator type="GenericDecorator"
-											 mode="visibility"
-											 property="ManualSmoothing"
-											 value="0" />
+						mode="visibility"
+						property="ManualSmoothing"
+						value="0" />
 					<PropertyWidgetDecorator type="GenericDecorator"
-											 mode="visibility"
-											 property="Smoothing"
-											 value="1" />
+						mode="visibility"
+						property="Smoothing"
+						value="1" />
 					<!-- show this widget when ManualSmoothing==0 -->
 				</Hints>
 			</DoubleVectorProperty>
 
-			<DoubleVectorProperty name="TestingRadius" command="SetTestingRadius" number_of_elements="1" default_values="1.0" panel_visibility="advanced">
+			<DoubleVectorProperty name="TestingRadius" command="SetTestingRadius"
+				number_of_elements="1" default_values="1.0" panel_visibility="advanced">
 				<Hints>
 					<PropertyWidgetDecorator type="GenericDecorator"
-											 mode="visibility"
-											 property="ManualSmoothing"
-											 value="0" />
+						mode="visibility"
+						property="ManualSmoothing"
+						value="0" />
 					<PropertyWidgetDecorator type="GenericDecorator"
-											 mode="visibility"
-											 property="Smoothing"
-											 value="1" />
+						mode="visibility"
+						property="Smoothing"
+						value="1" />
 					<!-- show this widget when ManualSmoothing==0 -->
 				</Hints>
 			</DoubleVectorProperty>
 
-			<IntVectorProperty name="Normalize" command="SetNormalize" number_of_elements="1" default_values="0" panel_visibility="advanced">
-				<BooleanDomain name="bool"/>
+			<IntVectorProperty name="Normalize" command="SetNormalize" number_of_elements="1"
+				default_values="0" panel_visibility="advanced">
+				<BooleanDomain name="bool" />
 				<Hints>
 					<PropertyWidgetDecorator type="GenericDecorator"
-												 mode="visibility"
-												 property="Smoothing"
-												 value="1" />
+						mode="visibility"
+						property="Smoothing"
+						value="1" />
 				</Hints>
 			</IntVectorProperty>
 
-			<DoubleVectorProperty name="Threshold" command="SetThreshold" number_of_elements="1" default_values="0.15" panel_visibility="advanced">
+			<DoubleVectorProperty name="Threshold" command="SetThreshold" number_of_elements="1"
+				default_values="0.15" panel_visibility="advanced">
 			</DoubleVectorProperty>
 
-			<DoubleVectorProperty name="Tolerance" command="SetTolerance" number_of_elements="1" default_values="0.1" panel_visibility="advanced">
+			<DoubleVectorProperty name="Tolerance" command="SetTolerance" number_of_elements="1"
+				default_values="0.1" panel_visibility="advanced">
 			</DoubleVectorProperty>
 
-			<IntVectorProperty name="ResultType" command="SetResultType" number_of_elements="1" default_values="1" panel_visibility="advanced">
+			<IntVectorProperty name="ResultType" command="SetResultType" number_of_elements="1"
+				default_values="1" panel_visibility="advanced">
 				<EnumerationDomain name="enum">
-					<Entry value="1" text="Return triangulated result."/>
-					<Entry value="2" text="Return result as line set."/>
-					<Entry value="3" text="Return result as point set."/>
+					<Entry value="1" text="Return triangulated result." />
+					<Entry value="2" text="Return result as line set." />
+					<Entry value="3" text="Return result as point set." />
 				</EnumerationDomain>
 				<Documentation>
 					This property indicates which type will be used to return the result.
 				</Documentation>
 			</IntVectorProperty>
 
-			<IntVectorProperty name="Connectivity" command="SetConnectivity" number_of_elements="1" default_values="8" panel_visibility="advanced">
+			<IntVectorProperty name="Connectivity" command="SetConnectivity" number_of_elements="1"
+				default_values="8" panel_visibility="advanced">
 				<EnumerationDomain name="enum">
-					<Entry value="4" text="4-connectivity"/>
-					<Entry value="8" text="8-connectivity"/>
+					<Entry value="4" text="4-connectivity" />
+					<Entry value="8" text="8-connectivity" />
 				</EnumerationDomain>
 				<Documentation>
-					This property indicates what type of connectivity we use to calculate the connected components.
+					This property indicates what type of connectivity we use to calculate the
+					connected components.
 				</Documentation>
 			</IntVectorProperty>
 
-			<DoubleVectorProperty name="ZipperAlpha" command="SetZipperAlpha" number_of_elements="1" default_values="2.0" panel_visibility="advanced">
+			<DoubleVectorProperty name="ZipperAlpha" command="SetZipperAlpha" number_of_elements="1"
+				default_values="2.0" panel_visibility="advanced">
 			</DoubleVectorProperty>
 
 			<PropertyGroup label="General settings">
@@ -673,9 +753,9 @@
 				<Property name="Normalize" />
 				<Hints>
 					<PropertyWidgetDecorator type="GenericDecorator"
-					  mode="visibility"
-					  property="SmoothInput"
-					  value="6" />
+						mode="visibility"
+						property="SmoothInput"
+						value="6" />
 				</Hints>
 			</PropertyGroup>
 
@@ -693,245 +773,275 @@
 			<!-- End ComputeEigenVectorField -->
 		</SourceProxy>
 
-		<SourceProxy name="ExtractMidsurfacePlus" class="vtkExtractMidsurfacePlus" label="Extract Midsurface Plus">
+		<SourceProxy name="ExtractMidsurfacePlus" class="vtkExtractMidsurfacePlus"
+			label="Extract Midsurface Plus">
 			<Documentation long_help="Long help." short_help="Short help.">
 				Description.
 			</Documentation>
 			<InputProperty name="Input" command="SetInputConnection">
 				<ProxyGroupDomain name="groups">
-					<Group name="sources"/>
-					<Group name="filters"/>
+					<Group name="sources" />
+					<Group name="filters" />
 				</ProxyGroupDomain>
 				<DataTypeDomain name="input_type">
-					<DataType value="vtkImageData"/>
+					<DataType value="vtkImageData" />
 				</DataTypeDomain>
 			</InputProperty>
 
-			<StringVectorProperty name="InputArray" label="Input mask" command="SetInputArray" element_types="2" number_of_elements="1">
-				<ArrayListDomain name="array_list" attribute_type="Scalars" input_domain_name="inputs_array">
+			<StringVectorProperty name="InputArray" label="Input mask" command="SetInputArray"
+				element_types="2" number_of_elements="1">
+				<ArrayListDomain name="array_list" attribute_type="Scalars"
+					input_domain_name="inputs_array">
 					<RequiredProperties>
 						<Property name="Input" function="Input" />
 					</RequiredProperties>
 				</ArrayListDomain>
 			</StringVectorProperty>
 
-			<IntVectorProperty name="AutomaticStepSize" command="SetAutomaticStepSize" number_of_elements="1" default_values="1" panel_visibility="advanced">
-				<BooleanDomain name="bool"/>
+			<IntVectorProperty name="AutomaticStepSize" command="SetAutomaticStepSize"
+				number_of_elements="1" default_values="1" panel_visibility="advanced">
+				<BooleanDomain name="bool" />
 			</IntVectorProperty>
 
-			<DoubleVectorProperty name="IntegrationStep" command="SetIntegrationStep" number_of_elements="1" default_values="0.5" panel_visibility="advanced">
+			<DoubleVectorProperty name="IntegrationStep" command="SetIntegrationStep"
+				number_of_elements="1" default_values="0.5" panel_visibility="advanced">
 				<Hints>
 					<PropertyWidgetDecorator type="GenericDecorator"
-											 mode="visibility"
-											 property="AutomaticStepSize"
-											 value="0" />
+						mode="visibility"
+						property="AutomaticStepSize"
+						value="0" />
 					<!-- show this widget when AutomaticStepSize==false -->
 				</Hints>
 			</DoubleVectorProperty>
 
-			<IntVectorProperty name="GoldenSectionSearch" command="SetGoldenSectionSearch" number_of_elements="1" default_values="1" panel_visibility="advanced">
-				<BooleanDomain name="bool"/>
+			<IntVectorProperty name="GoldenSectionSearch" command="SetGoldenSectionSearch"
+				number_of_elements="1" default_values="1" panel_visibility="advanced">
+				<BooleanDomain name="bool" />
 			</IntVectorProperty>
 
-			<IntVectorProperty name="ShapeDetection" command="SetShapeDetection" number_of_elements="1" default_values="1" panel_visibility="advanced">
-				<BooleanDomain name="bool"/>
+			<IntVectorProperty name="ShapeDetection" command="SetShapeDetection"
+				number_of_elements="1" default_values="1" panel_visibility="advanced">
+				<BooleanDomain name="bool" />
 			</IntVectorProperty>
 
-			<IntVectorProperty name="SmoothInput" command="SetSmoothInput" number_of_elements="1" default_values="6">
+			<IntVectorProperty name="SmoothInput" command="SetSmoothInput" number_of_elements="1"
+				default_values="6" panel_visibility="advanced">
 				<EnumerationDomain name="enum">
-					<Entry value="1" text="No smoothing"/>
-					<Entry value="2" text="Gaussian smoothing 2D"/>
-					<Entry value="3" text="Gaussian smoothing 3D"/>
-					<Entry value="4" text="Signed distance map (simple)"/>
-					<Entry value="5" text="Signed distance map"/>
-					<Entry value="6" text="Signed distance smooth 3D"/>
+					<Entry value="1" text="No smoothing" />
+					<Entry value="2" text="Gaussian smoothing 2D" />
+					<Entry value="3" text="Gaussian smoothing 3D" />
+					<Entry value="4" text="Signed distance map (simple)" />
+					<Entry value="5" text="Signed distance map" />
+					<Entry value="6" text="Signed distance smooth 3D" />
 				</EnumerationDomain>
 				<Documentation>
 					This property indicates which type will be used to return the result.
 				</Documentation>
 			</IntVectorProperty>
 
-			<DoubleVectorProperty name="RadiusFactors" command="SetRadiusFactors" number_of_elements="3" default_values="4.0 4.0 4.0" panel_visibility="advanced">
+			<DoubleVectorProperty name="RadiusFactors" command="SetRadiusFactors"
+				number_of_elements="3" default_values="4.0 4.0 4.0" panel_visibility="advanced">
 				<Hints>
 					<PropertyWidgetDecorator type="GenericDecorator"
-											 mode="visibility"
-											 property="SmoothInput"
-											 value="3" />
+						mode="visibility"
+						property="SmoothInput"
+						value="3" />
 					<!-- show this widget when SmoothInput==2 -->
 				</Hints>
 			</DoubleVectorProperty>
 
-			<DoubleVectorProperty name="StandardDeviations" command="SetStandardDeviations" number_of_elements="3" default_values="5.0 5.0 5.0" panel_visibility="advanced">
+			<DoubleVectorProperty name="StandardDeviations" command="SetStandardDeviations"
+				number_of_elements="3" default_values="5.0 5.0 5.0" panel_visibility="advanced">
 				<Hints>
 					<PropertyWidgetDecorator type="GenericDecorator"
-											 mode="visibility"
-											 property="SmoothInput"
-											 value="3" />
+						mode="visibility"
+						property="SmoothInput"
+						value="3" />
 					<!-- show this widget when SmoothInput==2 -->
 				</Hints>
 			</DoubleVectorProperty>
 
-			<DoubleVectorProperty name="RadiusFactorsSDF" command="SetRadiusFactorsSDF" number_of_elements="3" default_values="2.0 2.0 2.0" panel_visibility="advanced">
+			<DoubleVectorProperty name="RadiusFactorsSDF" command="SetRadiusFactorsSDF"
+				number_of_elements="3" default_values="2.0 2.0 2.0" panel_visibility="advanced">
 				<Hints>
 					<PropertyWidgetDecorator type="GenericDecorator"
-											 mode="visibility"
-											 property="SmoothInput"
-											 value="4" />
+						mode="visibility"
+						property="SmoothInput"
+						value="4" />
 					<!-- show this widget when SmoothInput==3 -->
 				</Hints>
 			</DoubleVectorProperty>
 
-			<DoubleVectorProperty name="StandardDeviationsSDF" command="SetStandardDeviationsSDF" number_of_elements="3" default_values="1.5 1.5 1.5" panel_visibility="advanced">
+			<DoubleVectorProperty name="StandardDeviationsSDF" command="SetStandardDeviationsSDF"
+				number_of_elements="3" default_values="1.5 1.5 1.5" panel_visibility="advanced">
 				<Hints>
 					<PropertyWidgetDecorator type="GenericDecorator"
-											 mode="visibility"
-											 property="SmoothInput"
-											 value="4" />
+						mode="visibility"
+						property="SmoothInput"
+						value="4" />
 					<!-- show this widget when SmoothInput==3 -->
 				</Hints>
 			</DoubleVectorProperty>
 
-			<IntVectorProperty name="FieldType" command="SetFieldType" number_of_elements="1" default_values="1">
+			<IntVectorProperty name="FieldType" command="SetFieldType" number_of_elements="1"
+				default_values="1" panel_visibility="advanced">
 				<EnumerationDomain name="enum">
-					<Entry value="1" text="Inside"/>
-					<Entry value="2" text="Outside"/>
-					<Entry value="3" text="Both"/>
+					<Entry value="1" text="Inside" />
+					<Entry value="2" text="Outside" />
+					<Entry value="3" text="Both" />
 				</EnumerationDomain>
 				<Documentation>
 					This property indicates which type of distance field we are calculating.
 				</Documentation>
 				<Hints>
 					<PropertyWidgetDecorator type="GenericDecorator"
-											 mode="visibility"
-											 property="SmoothInput"
-											 value="5" />
+						mode="visibility"
+						property="SmoothInput"
+						value="5" />
 					<!-- show this widget when SmoothInput==4 -->
 				</Hints>
 			</IntVectorProperty>
 
-			<IntVectorProperty name="DistanceType" command="SetDistanceType" number_of_elements="1" default_values="2">
+			<IntVectorProperty name="DistanceType" command="SetDistanceType" number_of_elements="1"
+				default_values="2" panel_visibility="advanced">
 				<EnumerationDomain name="enum">
-					<Entry value="1" text="2D"/>
-					<Entry value="2" text="3D"/>
+					<Entry value="1" text="2D" />
+					<Entry value="2" text="3D" />
 				</EnumerationDomain>
 				<Documentation>
-					This property indicates if we want to calculate signed distance per slice or for the entire volume.
+					This property indicates if we want to calculate signed distance per slice or for
+					the entire volume.
 				</Documentation>
 			</IntVectorProperty>
 
-			<IntVectorProperty name="Smoothing" command="SetSmoothing" number_of_elements="1" default_values="1">
-				<BooleanDomain name="bool"/>
+			<IntVectorProperty name="Smoothing" command="SetSmoothing" number_of_elements="1"
+				default_values="1" panel_visibility="advanced">
+				<BooleanDomain name="bool" />
 			</IntVectorProperty>
 
-			<IntVectorProperty name="ManualSmoothing" command="SetManualSmoothing" number_of_elements="1" default_values="0">
-				<BooleanDomain name="bool"/>
+			<IntVectorProperty name="ManualSmoothing" command="SetManualSmoothing"
+				number_of_elements="1" default_values="0" panel_visibility="advanced">
+				<BooleanDomain name="bool" />
 				<Hints>
 					<PropertyWidgetDecorator type="GenericDecorator"
-											 mode="visibility"
-											 property="SmoothInput"
-											 value="5" />
+						mode="visibility"
+						property="SmoothInput"
+						value="5" />
 					<!-- show this widget when SmoothInput==4 -->
 				</Hints>
 			</IntVectorProperty>
 
-			<DoubleVectorProperty name="SDFRadiusFactors" command="SetSDFRadiusFactors" number_of_elements="3" default_values="4.0 4.0 4.0">
+			<DoubleVectorProperty name="SDFRadiusFactors" command="SetSDFRadiusFactors"
+				number_of_elements="3" default_values="4.0 4.0 4.0" panel_visibility="advanced">
 				<Hints>
 					<PropertyWidgetDecorator type="GenericDecorator"
-											 mode="visibility"
-											 property="ManualSmoothing"
-											 value="1" />
+						mode="visibility"
+						property="ManualSmoothing"
+						value="1" />
 					<!-- show this widget when ManualSmoothing==1 -->
 				</Hints>
 			</DoubleVectorProperty>
 
-			<DoubleVectorProperty name="SDFStandardDeviations" command="SetSDFStandardDeviations" number_of_elements="3" default_values="5.0 5.0 5.0">
+			<DoubleVectorProperty name="SDFStandardDeviations" command="SetSDFStandardDeviations"
+				number_of_elements="3" default_values="5.0 5.0 5.0" panel_visibility="advanced">
 				<Hints>
 					<PropertyWidgetDecorator type="GenericDecorator"
-											 mode="visibility"
-											 property="ManualSmoothing"
-											 value="1" />
+						mode="visibility"
+						property="ManualSmoothing"
+						value="1" />
 					<!-- show this widget when ManualSmoothing==1 -->
 				</Hints>
 			</DoubleVectorProperty>
 
-			<DoubleVectorProperty name="SigmaDivisor" command="SetSigmaDivisor" number_of_elements="1" default_values="1">
+			<DoubleVectorProperty name="SigmaDivisor" command="SetSigmaDivisor"
+				number_of_elements="1" default_values="1" panel_visibility="advanced">
 				<Hints>
 					<PropertyWidgetDecorator type="GenericDecorator"
-											 mode="visibility"
-											 property="ManualSmoothing"
-											 value="0" />
+						mode="visibility"
+						property="ManualSmoothing"
+						value="0" />
 					<PropertyWidgetDecorator type="GenericDecorator"
-											 mode="visibility"
-											 property="Smoothing"
-											 value="1" />
+						mode="visibility"
+						property="Smoothing"
+						value="1" />
 					<!-- show this widget when ManualSmoothing==0 -->
 				</Hints>
 			</DoubleVectorProperty>
 
-			<DoubleVectorProperty name="TestingRadius" command="SetTestingRadius" number_of_elements="1" default_values="3.0">
+			<DoubleVectorProperty name="TestingRadius" command="SetTestingRadius"
+				number_of_elements="1" default_values="3.0" panel_visibility="advanced">
 				<Hints>
 					<PropertyWidgetDecorator type="GenericDecorator"
-											 mode="visibility"
-											 property="ManualSmoothing"
-											 value="0" />
+						mode="visibility"
+						property="ManualSmoothing"
+						value="0" />
 					<PropertyWidgetDecorator type="GenericDecorator"
-											 mode="visibility"
-											 property="Smoothing"
-											 value="1" />
+						mode="visibility"
+						property="Smoothing"
+						value="1" />
 					<!-- show this widget when ManualSmoothing==0 -->
 				</Hints>
 			</DoubleVectorProperty>
 
-			<IntVectorProperty name="Normalize" command="SetNormalize" number_of_elements="1" default_values="0">
-				<BooleanDomain name="bool"/>
+			<IntVectorProperty name="Normalize" command="SetNormalize" number_of_elements="1"
+				default_values="0" panel_visibility="advanced">
+				<BooleanDomain name="bool" />
 				<Hints>
 					<PropertyWidgetDecorator type="GenericDecorator"
-												 mode="visibility"
-												 property="Smoothing"
-												 value="1" />
+						mode="visibility"
+						property="Smoothing"
+						value="1" />
 				</Hints>
 			</IntVectorProperty>
 
-			<DoubleVectorProperty name="Threshold" command="SetThreshold" number_of_elements="1" default_values="0.15" panel_visibility="advanced">
+			<DoubleVectorProperty name="Threshold" command="SetThreshold" number_of_elements="1"
+				default_values="0.15" panel_visibility="advanced">
 			</DoubleVectorProperty>
 
-			<DoubleVectorProperty name="Tolerance" command="SetTolerance" number_of_elements="1" default_values="0.1" panel_visibility="advanced">
+			<DoubleVectorProperty name="Tolerance" command="SetTolerance" number_of_elements="1"
+				default_values="0.1" panel_visibility="advanced">
 			</DoubleVectorProperty>
 
-			<IntVectorProperty name="ResultType" command="SetResultType" number_of_elements="1" default_values="1">
+			<IntVectorProperty name="ResultType" command="SetResultType" number_of_elements="1"
+				default_values="1">
 				<EnumerationDomain name="enum">
-					<Entry value="1" text="Return triangulated result."/>
-					<Entry value="2" text="Return result as line set."/>
-					<Entry value="3" text="Return result as point set."/>
+					<Entry value="1" text="Return triangulated result." />
+					<Entry value="2" text="Return result as line set." />
+					<Entry value="3" text="Return result as point set." />
 				</EnumerationDomain>
 				<Documentation>
 					This property indicates which type will be used to return the result.
 				</Documentation>
 			</IntVectorProperty>
 
-<IntVectorProperty name="Connectivity" command="SetConnectivity" number_of_elements="1" default_values="8" panel_visibility="advanced">
+			<IntVectorProperty name="Connectivity" command="SetConnectivity" number_of_elements="1"
+				default_values="8" panel_visibility="advanced">
 				<EnumerationDomain name="enum">
-					<Entry value="4" text="4-connectivity"/>
-					<Entry value="8" text="8-connectivity"/>
+					<Entry value="4" text="4-connectivity" />
+					<Entry value="8" text="8-connectivity" />
 				</EnumerationDomain>
 				<Documentation>
-					This property indicates what type of connectivity we use to calculate the connected components.
+					This property indicates what type of connectivity we use to calculate the
+					connected components.
 				</Documentation>
 			</IntVectorProperty>
 
-			
-<IntVectorProperty name="Morphological" command="SetMorphological" number_of_elements="1" default_values="1" panel_visibility="advanced">
+
+			<IntVectorProperty name="Morphological" command="SetMorphological"
+				number_of_elements="1" default_values="1" panel_visibility="advanced">
 				<EnumerationDomain name="enum">
-					<Entry value="1" text="Dilation"/>
-					<Entry value="2" text="Closing"/>
-					<Entry value="3" text="None"/>
+					<Entry value="1" text="Dilation" />
+					<Entry value="2" text="Closing" />
+					<Entry value="3" text="None" />
 				</EnumerationDomain>
 				<Documentation>
-					This property indicates what type of Morphological operation we do on the segmentation mask.
+					This property indicates what type of Morphological operation we do on the
+					segmentation mask.
 				</Documentation>
 			</IntVectorProperty>
 
-			<DoubleVectorProperty name="ZipperAlpha" command="SetZipperAlpha" number_of_elements="1" default_values="2.0" panel_visibility="advanced">
+			<DoubleVectorProperty name="ZipperAlpha" command="SetZipperAlpha" number_of_elements="1"
+				default_values="2.0" panel_visibility="advanced">
 			</DoubleVectorProperty>
 
 			<PropertyGroup label="General settings">
@@ -958,14 +1068,14 @@
 				<Property name="Normalize" />
 				<Hints>
 					<PropertyWidgetDecorator type="GenericDecorator"
-					  mode="visibility"
-					  property="SmoothInput"
-					  value="6" />
+						mode="visibility"
+						property="SmoothInput"
+						value="6" />
 				</Hints>
 			</PropertyGroup>
 
 			<PropertyGroup label="Surface settings">
-<Property name="Connectivity" />
+				<Property name="Connectivity" />
 				<Property name="Threshold" />
 				<Property name="Tolerance" />
 				<Property name="ResultType" />
@@ -979,125 +1089,140 @@
 			<!-- End ExtractMidsurfacePlus -->
 		</SourceProxy>
 
-		<SourceProxy name="SignedDistanceField" class="vtkSignedDistanceField" label="Signed Distance Field">
+		<SourceProxy name="SignedDistanceField" class="vtkSignedDistanceField"
+			label="Signed Distance Field">
 			<Documentation long_help="Long help." short_help="Short help.">
 				Description.
 			</Documentation>
 			<InputProperty name="Input" command="SetInputConnection">
 				<ProxyGroupDomain name="groups">
-					<Group name="sources"/>
-					<Group name="filters"/>
+					<Group name="sources" />
+					<Group name="filters" />
 				</ProxyGroupDomain>
 				<DataTypeDomain name="input_type">
-					<DataType value="vtkImageData"/>
+					<DataType value="vtkImageData" />
 				</DataTypeDomain>
 			</InputProperty>
 
-			<StringVectorProperty name="InputArray" label="Input" command="SetInputArray" element_types="2" number_of_elements="1">
-				<ArrayListDomain name="array_list" attribute_type="Scalars" input_domain_name="inputs_array">
+			<StringVectorProperty name="InputArray" label="Input" command="SetInputArray"
+				element_types="2" number_of_elements="1">
+				<ArrayListDomain name="array_list" attribute_type="Scalars"
+					input_domain_name="inputs_array">
 					<RequiredProperties>
 						<Property name="Input" function="Input" />
 					</RequiredProperties>
 				</ArrayListDomain>
 			</StringVectorProperty>
 
-			<StringVectorProperty name="SDFResultName" label="Distance Result Name" command="SetSDFResultName" number_of_elements="1" default_values="dist">
+			<StringVectorProperty name="SDFResultName" label="Distance Result Name"
+				command="SetSDFResultName" number_of_elements="1" default_values="dist">
 			</StringVectorProperty>
 
-			<StringVectorProperty name="FinalResultName" label="Final Result Name" command="SetFinalResultName" number_of_elements="1" default_values="smooth">
+			<StringVectorProperty name="FinalResultName" label="Final Result Name"
+				command="SetFinalResultName" number_of_elements="1" default_values="smooth">
 			</StringVectorProperty>
 
-			<IntVectorProperty name="DistanceType" command="SetDistanceType" number_of_elements="1" default_values="1">
+			<IntVectorProperty name="DistanceType" command="SetDistanceType" number_of_elements="1"
+				default_values="1">
 				<EnumerationDomain name="enum">
-					<Entry value="1" text="2D"/>
-					<Entry value="2" text="3D"/>
+					<Entry value="1" text="2D" />
+					<Entry value="2" text="3D" />
 				</EnumerationDomain>
 				<Documentation>
-					This property indicates if we want to calculate signed distance per slice or for the entire volume.
+					This property indicates if we want to calculate signed distance per slice or for
+					the entire volume.
 				</Documentation>
 			</IntVectorProperty>
 
-			<IntVectorProperty name="FieldType" command="SetFieldType" number_of_elements="1" default_values="1">
+			<IntVectorProperty name="FieldType" command="SetFieldType" number_of_elements="1"
+				default_values="1">
 				<EnumerationDomain name="enum">
-					<Entry value="1" text="Inside"/>
-					<Entry value="2" text="Outside"/>
-					<Entry value="3" text="Both"/>
+					<Entry value="1" text="Inside" />
+					<Entry value="2" text="Outside" />
+					<Entry value="3" text="Both" />
 				</EnumerationDomain>
 				<Documentation>
 					This property indicates which type of distance field we are calculating.
 				</Documentation>
 			</IntVectorProperty>
 
-			<IntVectorProperty name="Smoothing" command="SetSmoothing" number_of_elements="1" default_values="1">
-				<BooleanDomain name="bool"/>
+			<IntVectorProperty name="Smoothing" command="SetSmoothing" number_of_elements="1"
+				default_values="1">
+				<BooleanDomain name="bool" />
 			</IntVectorProperty>
 
-			<IntVectorProperty name="ManualSmoothing" command="SetManualSmoothing" number_of_elements="1" default_values="0">
-				<BooleanDomain name="bool"/>
+			<IntVectorProperty name="ManualSmoothing" command="SetManualSmoothing"
+				number_of_elements="1" default_values="0">
+				<BooleanDomain name="bool" />
 				<Hints>
 					<PropertyWidgetDecorator type="GenericDecorator"
-											 mode="visibility"
-											 property="Smoothing"
-											 value="1" />
+						mode="visibility"
+						property="Smoothing"
+						value="1" />
 					<!-- show this widget when Smoothing==1 -->
 				</Hints>
 			</IntVectorProperty>
 
-			<DoubleVectorProperty name="RadiusFactors" command="SetRadiusFactors" number_of_elements="3" default_values="4.0 4.0 4.0">
+			<DoubleVectorProperty name="RadiusFactors" command="SetRadiusFactors"
+				number_of_elements="3" default_values="4.0 4.0 4.0">
 				<Hints>
 					<PropertyWidgetDecorator type="GenericDecorator"
-											 mode="visibility"
-											 property="ManualSmoothing"
-											 value="1" />
+						mode="visibility"
+						property="ManualSmoothing"
+						value="1" />
 					<!-- show this widget when ManualSmoothing==1 -->
 				</Hints>
 			</DoubleVectorProperty>
 
-			<DoubleVectorProperty name="StandardDeviations" command="SetStandardDeviations" number_of_elements="3" default_values="5.0 5.0 5.0">
+			<DoubleVectorProperty name="StandardDeviations" command="SetStandardDeviations"
+				number_of_elements="3" default_values="5.0 5.0 5.0">
 				<Hints>
 					<PropertyWidgetDecorator type="GenericDecorator"
-											 mode="visibility"
-											 property="ManualSmoothing"
-											 value="1" />
+						mode="visibility"
+						property="ManualSmoothing"
+						value="1" />
 					<!-- show this widget when ManualSmoothing==1 -->
 				</Hints>
 			</DoubleVectorProperty>
 
-			<DoubleVectorProperty name="SigmaDivisor" command="SetSigmaDivisor" number_of_elements="1" default_values="3.0">
+			<DoubleVectorProperty name="SigmaDivisor" command="SetSigmaDivisor"
+				number_of_elements="1" default_values="3.0">
 				<Hints>
 					<PropertyWidgetDecorator type="GenericDecorator"
-											 mode="visibility"
-											 property="ManualSmoothing"
-											 value="0" />
+						mode="visibility"
+						property="ManualSmoothing"
+						value="0" />
 					<PropertyWidgetDecorator type="GenericDecorator"
-											 mode="visibility"
-											 property="Smoothing"
-											 value="1" />
+						mode="visibility"
+						property="Smoothing"
+						value="1" />
 					<!-- show this widget when ManualSmoothing==0 -->
 				</Hints>
 			</DoubleVectorProperty>
 
-			<DoubleVectorProperty name="TestingRadius" command="SetTestingRadius" number_of_elements="1" default_values="1.0">
+			<DoubleVectorProperty name="TestingRadius" command="SetTestingRadius"
+				number_of_elements="1" default_values="1.0">
 				<Hints>
 					<PropertyWidgetDecorator type="GenericDecorator"
-											 mode="visibility"
-											 property="ManualSmoothing"
-											 value="0" />
+						mode="visibility"
+						property="ManualSmoothing"
+						value="0" />
 					<PropertyWidgetDecorator type="GenericDecorator"
-											 mode="visibility"
-											 property="Smoothing"
-											 value="1" />
+						mode="visibility"
+						property="Smoothing"
+						value="1" />
 					<!-- show this widget when ManualSmoothing==0 -->
 				</Hints>
 			</DoubleVectorProperty>
 
-			<IntVectorProperty name="Normalize" command="SetNormalize" number_of_elements="1" default_values="0">
-				<BooleanDomain name="bool"/>
+			<IntVectorProperty name="Normalize" command="SetNormalize" number_of_elements="1"
+				default_values="0">
+				<BooleanDomain name="bool" />
 				<Hints>
 					<PropertyWidgetDecorator type="GenericDecorator"
-												 mode="visibility"
-												 property="Smoothing"
-												 value="1" />
+						mode="visibility"
+						property="Smoothing"
+						value="1" />
 				</Hints>
 			</IntVectorProperty>
 
