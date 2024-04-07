@@ -41,7 +41,7 @@ In addition, the plugin provides the following filters, which are used in the Mi
 
 ## Data sets
 
-TODO: links to Nature and morphometrics data sets
+Data sets used in the paper and summarized in Table 1 therein can be found in the [data](data/) folder.
 
 ## Method
 
