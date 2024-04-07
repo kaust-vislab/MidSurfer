@@ -41,10 +41,10 @@ In addition, the plugin provides the following filters, which are used in the Mi
 
 ## Data sets
 
-TODO: links to Nature and morphometrics data sets
+Data sets used in our paper can be found in [data](data) folder.
 
 ## Method
 
 ![Method](images/method.png)
 
-TODO: link to paper web page
+The preprint version of the paper, detailing the methodologies, experiments, and findings related to the MidSurfer, is available on __(link to be added on 9th of April)__. 
