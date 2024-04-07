@@ -26,8 +26,8 @@ The MidSurfer plugin can be installed using the standard CMake procedure:
 
 Once the plugin has been built, it can be loaded via `Tools->Manage Plugins...`, pressing `Load New..` and selecting the plugin binary (`MidSurfer.[so|dll]`, depending on the operating system). This adds an entry `MidSurfer` in the `Filters` menu which provides the following filters:
 
-* `Extract Midsurface (fast)`: The basic algorithm, which can be used on segmentation masks with well defined structures (like `Fig7.vti`, `Fig13A.vti`, and `Fig13B.vti` in the data folder, corresponding to Fig.7, Fig13(A), and Fig.13(B) in the paper).
-* `Extract Midsurface (TODO)`: The complete algorithm, which is slower but also works on segmentation masks with very thin structures (like `Fig11-IMM.vti`, and `Fig11-OMM.vti` in the data folder, corresponding to Fig.11 in the paper).
+* `Extract Midsurface (simple)`: The basic algorithm, which can be used on segmentation masks with well defined structures (like `Fig7.vti`, `Fig13A.vti`, and `Fig13B.vti` in the data folder, corresponding to Fig.7, Fig13(A), and Fig.13(B) in the paper).
+* `Extract Midsurface (advanced)`: The complete algorithm, which is slower but also works on segmentation masks with very thin structures (like `Fig11-IMM.vti`, and `Fig11-OMM.vti` in the data folder, corresponding to Fig.11 in the paper).
 
 By toggling the advanced properties button (little gear icon on the top right in the Properties panel), parameters which are automatically set by the algorithm can be accessed for illustration and exploration of the algorithm (disclaimer: not all combinations have been tested or might even make sense).
 
