@@ -469,7 +469,7 @@
 		</SourceProxy>
 
 		<SourceProxy name="ExtractMidsurface" class="vtkExtractMidsurface"
-			label="Extract Midsurface">
+			label="Extract Midsurface (simple)">
 			<Documentation long_help="Long help." short_help="Short help.">
 				Description.
 			</Documentation>
@@ -774,7 +774,7 @@
 		</SourceProxy>
 
 		<SourceProxy name="ExtractMidsurfacePlus" class="vtkExtractMidsurfacePlus"
-			label="Extract Midsurface Plus">
+			label="Extract Midsurface (advanced)">
 			<Documentation long_help="Long help." short_help="Short help.">
 				Description.
 			</Documentation>
@@ -1003,7 +1003,7 @@
 			</DoubleVectorProperty>
 
 			<IntVectorProperty name="ResultType" command="SetResultType" number_of_elements="1"
-				default_values="1">
+				default_values="1" panel_visibility="advanced">
 				<EnumerationDomain name="enum">
 					<Entry value="1" text="Return triangulated result." />
 					<Entry value="2" text="Return result as line set." />

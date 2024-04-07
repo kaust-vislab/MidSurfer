@@ -1,11 +1,19 @@
-# MidSurfer
-Paraview Plugin for extracting mid-surfaces from volumetric segmentation masks. 
+# MidSurfer - A Paraview Plugin for extracting mid-surfaces from segmentations masks
 
 ![Teaser](images/teaser.png)
 
+<!--toc:start-->
+- [Overview](#overview)
+- [Installation](#installation)
+- [Using the MidSurfer Plugin](#using-the-midsurfer-plugin)
+- [Data Sets](#data-sets)
+- [Method](#method)
+- [Publications](#publications)
+<!--toc:end-->
+
 ## Overview
 
-TODO
+MidSurfer is a novel parameter-free method for extracting mid-surfaces from segmented volumetric data. Our method produces smooth, uniformly triangulated meshes that accurately capture the structural features of interest. This repository provides the source code, which can be comiled into a plugin for [ParaView](https://www.paraview.org).
 
 ## Installation
 
@@ -27,8 +35,10 @@ The MidSurfer plugin can be installed using the standard CMake procedure:
 
 Once the plugin has been built, it can be loaded via `Tools->Manage Plugins...`, pressing `Load New..` and selecting the plugin binary (`MidSurfer.[so|dll]`, depending on the operating system). This adds an entry `MidSurfer` in the `Filters` menu which provides the following filters:
 
-* `Extract Midsurface (fast)`: The basic algorithm, which can be used on segmentation masks with well defined structures (like `Fig7.vti` and `Fig13.vti` in the data folder, corresponding to Fig.7 and Fig.13 in the paper).
-* `Extract Midsurface (TODO)`: The complete algorithm, which is slower but also works on segmentation masks with very thin structures (TODO: add data sets to folder or provide download link)
+* `Extract Midsurface (simple)`: The basic algorithm, which can be used on segmentation masks with well defined structures (like `Fig7.vti`, `Fig13A.vti`, and `Fig13B.vti` in the data folder, corresponding to Fig.7, Fig13(A), and Fig.13(B) in the paper).
+* `Extract Midsurface (advanced)`: The complete algorithm, which is slower but also works on segmentation masks with very thin structures (like `Fig11-IMM.vti`, and `Fig11-OMM.vti` in the data folder, corresponding to Fig.11 in the paper).
+
+By toggling the advanced properties button (little gear icon on the top right in the Properties panel), parameters which are automatically set by the algorithm can be accessed for illustration and exploration of the algorithm (disclaimer: not all combinations have been tested or might even make sense).
 
 In addition, the plugin provides the following filters, which are used in the MidSurfer algorithm itself. These filters can be used to explore individual steps of the algorithm, but might be useful as standalone filters as well:
 
@@ -41,10 +51,16 @@ In addition, the plugin provides the following filters, which are used in the Mi
 
 ## Data sets
 
-Data sets used in our paper can be found in [data](data) folder.
+Data sets used in the paper and summarized in Table 1 therein can be found in the [data](data/) folder.
 
 ## Method
 
+Schematic overview of the Mid-surface Extraction algorithm, for a detailed exposition please refer to the paper.
+
 ![Method](images/method.png)
+
+## Publications
+
+Eva Boneš, Dawar Khan, Ciril Bohak, Benjamin A. Barad, Danielle A. Grotjahn, Ivan Viola,  Thomas Theußl, <i>"MidSurfer: A Parameter-Free Approach for Mid-Surface Extraction from Segmented Volumetric Data"</i>, submitted.
 
 The preprint version of the paper, detailing the methodologies, experiments, and findings related to the MidSurfer, is available on __(link to be added on 9th of April)__. 
