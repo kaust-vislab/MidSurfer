@@ -46,7 +46,7 @@ In addition, the plugin provides the following filters, which are used in the Mi
 * `Compute Eigen Vector Field`: Takes a binary (that is, with only values 0 and 1) 2D image and computes curvature tensor and Eigenvector fields (the latter should be interpreterd as a line field). Various options for computing a smoothed height field are available for illustration. This filter is not used in the actual algorithm but used for illustrating it, see Fig.5 in tha paper.
 * `Extract Center Line`: Takes a binary (that is, with only values 0 and 1) 2D image and extracts the mid-polyline from each component (using the `Compute Cennected Components in Binary Image` filter). Various options for computing a smoothed height field are available for illustration. See Section 3.3 in the paper.
 * `Generate Point Cloud From Segmentation Mask`: Takes a binary (that is, with only values 0 and 1) 2D /3D image and extracts the segmented pixels/voxels as a point cloud. This filter can be used to reproduce Barad et al.'s approach (ref [6] in the paper) for comparison by computing point normals and using screened Poisson Surface Reconstruction using, e.g., Meshlab or CGAL.
-* `Signed Distance Field`: Takes a binary (that is, with only values 0 and 1) 2D /3D image and computes the (smoothed) signed distance field for the segentation mask.
+* `Signed Distance Field`: Takes a binary (that is, with only values 0 and 1) 2D /3D image and computes the (smoothed) signed distance field for the segmentation mask.
 * `Zipper Triangulation`: Takes a line set (as produced by the `Extract Midsurface (_)` filters) and computes a triangulation using the Polyline Zipper Algorithm. See Section 3.4 in the paper.
 
 ## Data sets
