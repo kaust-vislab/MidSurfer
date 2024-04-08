@@ -1,4 +1,4 @@
-# MidSurfer - A Paraview Plugin for extracting mid-surfaces from segmentations masks
+# MidSurfer - A Paraview Plugin for extracting mid-surfaces from segmentation masks
 
 ![Teaser](images/teaser.png)
 
