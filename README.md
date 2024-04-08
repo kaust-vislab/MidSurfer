@@ -15,6 +15,8 @@
 
 MidSurfer is a novel parameter-free method for extracting mid-surfaces from segmented volumetric data. Our method produces smooth, uniformly triangulated meshes that accurately capture the structural features of interest. This repository provides the source code, which can be compiled into a plugin for [ParaView](https://www.paraview.org).
 
+The code has been tested on macOS Sonama Version 14.2.1 and Linux Ubuntu 20.04.6 LTS using ParaView 5.11.2.
+
 ## Installation
 
 The MidSurfer plugin requires the following software:
