@@ -63,9 +63,7 @@ Schematic overview of the Mid-surface Extraction algorithm, for a detailed expos
 
 ## Publications
 
-Eva Boneš, Dawar Khan, Ciril Bohak, Benjamin A. Barad, Danielle A. Grotjahn, Ivan Viola,  Thomas Theußl, <i>"MidSurfer: A Parameter-Free Approach for Mid-Surface Extraction from Segmented Volumetric Data"</i>, submitted.
-
-The preprint version of the paper, detailing the methodologies, experiments, and findings related to the MidSurfer, is available on [arvix.org](https://arxiv.org/abs/2405.19339).
+Eva Boneš, Dawar Khan, Ciril Bohak, Benjamin A. Barad, Danielle A. Grotjahn, Ivan Viola,  Thomas Theußl, <i>"MidSurfer: A Parameter-Free Approach for Mid-Surface Extraction from Segmented Volumetric Data"</i>, [arxiv.org preprint](https://arxiv.org/abs/2405.19339).
 
 If you find our work useful, please consider citing our paper:
 ```bibtex
