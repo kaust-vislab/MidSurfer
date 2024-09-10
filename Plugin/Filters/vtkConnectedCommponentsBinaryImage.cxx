@@ -9,6 +9,8 @@
 #include <vtkPointData.h>
 #include <vtkIntArray.h>
 
+#include <queue>
+
 vtkStandardNewMacro(vtkConnectedCommponentsBinaryImage);
 
 //----------------------------------------------------------------------------
@@ -51,6 +53,7 @@ int vtkConnectedCommponentsBinaryImage::RequestData(vtkInformation *vtkNotUsed(r
 }
 
 /// @brief from https://stackoverflow.com/questions/22051069/how-do-i-find-the-connected-components-in-a-binary-image
+///        and replaced recursive version with queue based one as in https://www.geeksforgeeks.org/flood-fill-algorithm/
 /// @param output the vtkImageData to add the RegionsIDs to
 void vtkConnectedCommponentsBinaryImage::AddRegionIDs(vtkImageData *output)
 {
@@ -97,12 +100,29 @@ void vtkConnectedCommponentsBinaryImage::dfs(int x, int y, int c, std::vector<st
 	int dx[8] = {0, 1, 0, -1, 1, 1, -1, -1};
 	int dy[8] = {1, 0, -1, 0, 1, -1, -1, 1};
 
+	std::queue<std::pair<int, int>> q;
+
+	int prevC = g[x][y];
+
+	q.push({x, y});
 	w[x][y] = c;
-	for (unsigned int i = 0; i < this->Connectivity; i++)
+
+	while (!q.empty())
 	{
-		int nx = x + dx[i], ny = y + dy[i];
-		if ((g[nx][ny] > 0) && (w[nx][ny] == 0))
-			dfs(nx, ny, c, g, w);
+		x = q.front().first;
+		y = q.front().second;
+		q.pop();
+
+		for (unsigned int i = 0; i < this->Connectivity; i++)
+		{
+			int nx = x + dx[i], ny = y + dy[i];
+
+			if ((g[nx][ny] == prevC) && (w[nx][ny] == 0))
+			{
+				w[nx][ny] = c;
+				q.push({nx, ny});
+			}
+		}
 	}
 }
 
