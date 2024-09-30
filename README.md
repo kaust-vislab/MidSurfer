@@ -63,7 +63,7 @@ Schematic overview of the Mid-surface Extraction algorithm, for a detailed expos
 ![Method](images/method.png)
 
 ## Video
-[![Watch the Video]( https://www.youtube.com/watch?v=aj_UzkKL0-s)]( https://www.youtube.com/watch?v=aj_UzkKL0-s)
+[![Watch the Video]( images/video1.png)]( https://www.youtube.com/watch?v=aj_UzkKL0-s)
 Watch a demo video of the MidSurfer. 
 
 
