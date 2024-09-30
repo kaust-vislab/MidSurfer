@@ -8,6 +8,7 @@
 - [Using the MidSurfer Plugin](#using-the-midsurfer-plugin)
 - [Data Sets](#data-sets)
 - [Method](#method)
+- [Video](#Video)
 - [Publications](#publications)
 <!--toc:end-->
 
@@ -60,6 +61,11 @@ Data sets used in the paper and summarized in Table 1 therein can be found in th
 Schematic overview of the Mid-surface Extraction algorithm, for a detailed exposition please refer to the paper.
 
 ![Method](images/method.png)
+
+## Video
+[![Watch the Video]( https://www.youtube.com/watch?v=aj_UzkKL0-s)]( https://www.youtube.com/watch?v=aj_UzkKL0-s)
+Watch a demo video of the MidSurfer. 
+
 
 ## Publications
 
