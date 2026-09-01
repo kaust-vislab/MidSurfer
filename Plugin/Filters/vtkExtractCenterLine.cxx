@@ -1067,7 +1067,7 @@ int vtkExtractCenterLine::SelectStartingPoints(vtkImageData *slice)
 		{
 			if (this->IsDiskShaped(mask, k))
 			{
-				vtkLog(INFO, "Detected disk shape. Discarding.")
+				vtkLog(INFO, "Detected disk shape. Discarding.");
 					remove.push_back(k);
 			}
 		}
@@ -1216,7 +1216,7 @@ std::unordered_map<int, Point3> vtkExtractCenterLine::SelectStartingPointsPlus(v
 		{
 			if (this->IsDiskShaped(mask, k))
 			{
-				vtkLog(INFO, "Detected disk shape. Discarding.")
+				vtkLog(INFO, "Detected disk shape. Discarding.");
 					remove.push_back(k);
 			}
 		}
